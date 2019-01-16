@@ -72,21 +72,22 @@ foreach ($R in $ResourcesWithTags) {
     $CurrentResourceTags = @{}
     $duplicates = $null
     $item = $null
+    $TagsHashTableClone = $TagsHashTable
 
     $CurrentResourceTags = Get-AzResource -ResourceGroupName $RSGName -ResourceType $ResourceType -ResourceName $R.Name | select Tags
     
     $CurrentResourceTagsHashTable = $CurrentResourceTags.Tags
 
-    $duplicates =  $CurrentResourceTagsHashTable.Keys | where {$TagsHashTable.ContainsKey($_)}
+    $duplicates =  $CurrentResourceTagsHashTable.Keys | where {$TagsHashTableClone.ContainsKey($_)}
     
     ## Look for duplicate tag key-value pairs and remove them from tags to add
     if ($duplicates) {
     foreach ($item in $duplicates) {
-            $TagsHashTable.Remove($item)
+            $TagsHashTableClone.Remove($item)
             }
     }
 
-    $NoDuplicatesHashTable = $CurrentResourceTagsHashTable+$TagsHashTable
+    $NoDuplicatesHashTable = $CurrentResourceTagsHashTable+$TagsHashTableClone
 
     Set-AzResource -Tag $NoDuplicatesHashTable -ResourceGroupName $RSGName -ResourceType $ResourceType -ResourceName $R.Name -Force 
   
