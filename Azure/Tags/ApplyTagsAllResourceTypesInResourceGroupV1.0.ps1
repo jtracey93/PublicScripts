@@ -92,3 +92,7 @@ foreach ($R in $ResourcesWithTags) {
     Set-AzResource -Tag $NoDuplicatesHashTable -ResourceGroupName $RSGName -ResourceType $ResourceType -ResourceName $R.Name -Force 
   
 }
+
+Write-Host "Tags Applied Successfully" -ForegroundColor Green
+
+Read-Host -Prompt 'Press Enter To Close...'
