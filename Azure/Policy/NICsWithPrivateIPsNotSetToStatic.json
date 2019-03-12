@@ -1,0 +1,26 @@
+{
+    "mode": "All",
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "Microsoft.Network/networkInterfaces/ipconfigurations[*].privateIPAllocationMethod",
+            "notEquals": "Static"
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]"
+      }
+    },
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Required value for policy definition effect action. Will default to audit if nothing specified.",
+          "description": null
+        },
+        "defaultValue": "audit"
+      }
+    }
+  }
