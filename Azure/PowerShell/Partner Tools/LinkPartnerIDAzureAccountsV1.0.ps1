@@ -66,4 +66,24 @@ else {
     exit
 }
 
-# Collect Azure AD Info
+# Collect New MPN Partner ID 
+
+$MPNPartnerID = $null
+do {
+    Write-Host "Please enter the MPN Partner ID you wish to link this customers Azure too:" -ForegroundColor Blue
+    $MPNPartnerID = Read-Host
+} until ($MPNPartnerID -ne "$null")
+
+Write-Host "MPN Partner ID Captured:"$MPNPartnerID -ForegroundColor Green
+
+# Collect Azure Partner ID Info
+
+Write-Host "Checking if existing MPN Partner ID is set to any value"
+
+$existingMPNPartnerIdInfo = $null
+
+$existingMPNPartnerIdInfo = Get-AzManagementPartner
+
+if ($existingMPNPartnerIdInfo -eq "$null") {
+    Write-Host "MPN Partner ID Not Set To Any Value" -ForegroundColor Green
+}
