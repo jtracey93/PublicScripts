@@ -4,7 +4,7 @@
 
 ## *NOTES START*
 ## This script will gather the MPN ID that you enter and then assign this to the user in the Azure AD tenant you are logged in as.
-## This script requires the following modules to be installed: 'Az', 'AzureAD' & 'Az.ManagementPartner'.
+## This script requires the following modules to be installed: 'Az' & 'Az.ManagementPartner'.
 ## The script will fail if neither of these modules are installed.
 ## *NOTES END*
 
@@ -24,17 +24,6 @@ else {
     Write-Host ""
 }
 
-if (Get-InstalledModule -Name 'AzureAD' -ErrorAction SilentlyContinue) {
-    Write-Host "AzureAD PowerShell Module Installed" -ForegroundColor Green
-    Write-Host ""
-}
-else {
-    Write-Host "AzureAD PowerShell Module NOT Installed" -ForegroundColor Red
-    Write-Host "Please install the module, following the instructions listed here:" -ForegroundColor Yellow
-    Write-Host "https://docs.microsoft.com/en-us/powershell/azure/active-directory/install-adv2" -ForegroundColor Yellow
-    Write-Host ""
-}
-
 if (Get-InstalledModule -Name 'Az.ManagementPartner' -ErrorAction SilentlyContinue) {
     Write-Host "Az.ManagementPartner PowerShell Module Installed" -ForegroundColor Green
     Write-Host ""
@@ -46,38 +35,35 @@ else {
     Write-Host ""
 }
 
+# Collect Tenant ID
+
+Write-Host "For the next step you will require the Azure AD Tenant/Directory ID for the customer you wish to set the Partner ID for." -ForegroundColor Cyan
+Write-Host ""
+Write-Host "This can be found by following the instructions listed below:" -ForegroundColor Yellow
+Write-Host "1 - Login to the customers Azure portal. `n2 - Select the 'Azure Active Directory' blade/console. `n3 - Select 'Properties' from the left hand side menu. `n4 - The 'Directory ID' is the value you require. Copy this value." -ForegroundColor Magenta
+
+Write-Host "Please enter the customers Azure AD Tenant/Directory ID below:" -ForegroundColor Blue
+$customerAzureADID = Read-Host
+
 # Connect To Azure Account
 
-Write-Host "Login To Azure Management (ARM)..." -ForegroundColor Cyan
-Write-Host "Please login with the account you wish to link your Partner ID"
+Write-Host "Logging In To The Azure Management Plane (ARM)..." -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Please login with the account you wish to link your Partner ID." -ForegroundColor Blue
+Write-Host "This account must have permissions on the customers Azure platform." -ForegroundColor Yellow
+Write-Host ""
 
-Connect-AzAccount -ErrorAction SilentlyContinue
-$AzureLoginCheck = Get-AzContext -ListAvailable
+Connect-AzAccount -TenantId $customerAzureADID -ErrorAction SilentlyContinue
+$AzureLoginCheck = Get-AzContext
 
-if ($AzureLoginCheck -eq "$null") {
+if ($AzureLoginCheck.Tenant.Id -eq $customerAzureADID) {
     Write-Host "Logged in to Azure Management ARM successfully" -ForegroundColor Green
     Write-Host ""
 }
 else {
-    Write-Host "Login failed to Azure. This script will now close when any key is pressed. Please rerun the script to try again." -ForegroundColor Red
+    Write-Host "Login failed to customers Azure platform. This script will now close when any key is pressed. Please rerun the script to try again." -ForegroundColor Red
     Read-Host
     exit
 }
 
-# Connect To AzureAD
-
-Write-Host "Login To Azure AD ..." -ForegroundColor Cyan
-Write-Host "Please login with the same account as you used previously."
-
-Connect-AzureAD -ErrorAction SilentlyContinue
-$AzureADLoginCheck = Get-AzContext -ListAvailable
-
-if ($AzureADLoginCheck -eq "$null") {
-    Write-Host "Logged in to Azure AD successfully" -ForegroundColor Green
-    Write-Host ""
-}
-else {
-    Write-Host "Login failed to Azure AD. This script will now close when any key is pressed. Please rerun the script to try again." -ForegroundColor Red
-    Read-Host
-    exit
-}
+# Collect Azure AD Info
