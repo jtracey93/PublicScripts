@@ -1,4 +1,4 @@
-## Name     : LinkPartnerIDAzureAccountsV1.0.ps1
+## Name     : LinkPartnerIDAzureAccountsV1.ps1
 ## Author   : Jack Tracey - https://jacktracey.co.uk
 ## Version  : 1.0
 
@@ -7,6 +7,17 @@
 ## This script requires the following modules to be installed: 'Az' & 'Az.ManagementPartner'.
 ## The script will fail if neither of these modules are installed.
 ## *NOTES END*
+
+# Creating Log File & Starting Transcript
+
+$DateTime = Get-Date -Format dd-MM-yyyy-HHmm
+$LogFileName = 'LinkPartnerIDAzureAccountsV1-Log-' +$DateTime+ '.txt'
+
+$LogFile = New-Item -Name "$LogFileName" -ItemType File -ErrorAction Stop
+Start-Transcript -Path $LogFile -ErrorAction Stop
+
+Write-Host "Logging started and will be stored in this file:" $LogFile.FullName -ForegroundColor Yellow
+Write-Host ""
 
 # Check Required Modules Are Installed
 
@@ -45,6 +56,9 @@ Write-Host ""
 Write-Host "Please enter the customers Azure AD Tenant/Directory ID below, followed by pressing the 'Enter/Return' key:" -ForegroundColor Cyan
 $customerAzureADID = Read-Host
 
+Write-Host ""
+Write-Host "Azure AD Tenant/Directory ID entered:" $customerAzureADID -ForegroundColor Yellow
+
 # Connect To Azure Account
 
 Write-Host "Logging In To The Azure Management Plane (ARM)..." -ForegroundColor Cyan
@@ -63,6 +77,7 @@ if ($AzureLoginCheck.Tenant.Id -eq $customerAzureADID) {
 else {
     Write-Host "Login failed to customers Azure platform. This script will now close when any key is pressed. Please rerun the script to try again." -ForegroundColor Red
     Read-Host
+    Stop-Transcript
     exit
 }
 
@@ -70,19 +85,21 @@ else {
 
 $MPNPartnerID = $null
 do {
-    Write-Host "Please enter the MPN Partner ID you wish to link this customers Azure too:" -ForegroundColor Cyan
+    Write-Host "Please enter the MPN Partner ID you wish to link this customers Azure too, followed by pressing the 'Enter/Return' key:" -ForegroundColor Cyan
     $MPNPartnerID = Read-Host
 } until ($MPNPartnerID -ne "$null")
 
 Write-Host "MPN Partner ID Captured:"$MPNPartnerID -ForegroundColor Green
+Write-Host ""
 
 # Collect Azure Existing MPN Partner ID Info
 
 Write-Host "Checking if existing MPN Partner ID is set to any value"
+Write-Host ""
 
 $existingMPNPartnerIdInfo = $null
 
-$existingMPNPartnerIdInfo = Get-AzManagementPartner
+$existingMPNPartnerIdInfo = Get-AzManagementPartner -ErrorAction SilentlyContinue
 
 if ($existingMPNPartnerIdInfo -eq "$null") {
     Write-Host "MPN Partner ID Not Currently Set To Any Value" -ForegroundColor Green
@@ -101,6 +118,7 @@ if ($existingMPNPartnerIdInfo.PartnerId -eq $MPNPartnerID) {
     Write-Host ""
     Write-Host "No action is required. This script will close when any key is pressed." -ForegroundColor Green
     Read-Host
+    Stop-Transcript
     exit
 }
 else {
@@ -127,7 +145,8 @@ if ($setNewMPNPartnerId -eq 'n') {
     Write-Host "Which is for the MPN Partner named:" $existingMPNPartnerIdInfo.PartnerName -ForegroundColor Cyan
     Write-Host ""
     Write-Host "This script will close when any key is pressed." -ForegroundColor Red
-    Read-Host ""
+    Read-Host
+    Stop-Transcript
     exit
 }
 
@@ -157,16 +176,21 @@ $newMPNPartnerIdInfo = Get-AzManagementPartner -ErrorAction SilentlyContinue
 if ($newMPNPartnerIdInfo.PartnerId -eq $MPNPartnerID) {
     Write-Host "MPN Partner ID Set Correctly!" -ForegroundColor Green
     Write-Host ""
+    Write-Host "MPN Parnter ID currently set to:" $newMPNPartnerIdInfo.PartnerId -ForegroundColor Yellow
+    Write-Host "Which is for the MPN Partner named:" $newMPNPartnerIdInfo.PartnerName -ForegroundColor Yellow
+    Write-Host ""
     Write-Host "Script complete and will therefore close when any key is pressed" -ForegroundColor Green
     Read-Host
+    Stop-Transcript
 }
 else {
     Write-Host "MPN Partner ID Not Set Correctly. Please Check Log File To Investigate" -ForegroundColor Red
     Write-Host ""
     Write-Host "MPN Parnter ID currently set to:" $newMPNPartnerIdInfo.PartnerId -ForegroundColor Yellow
-    Write-Host "Which is for the MPN Partner named:" $newMPNPartnerIdInfo.PartnerName
+    Write-Host "Which is for the MPN Partner named:" $newMPNPartnerIdInfo.PartnerName -ForegroundColor Yellow
     Write-Host ""
     Write-Host "This script will now close when any key is pressed" -ForegroundColor Cyan
     Read-Host
+    Stop-Transcript 
     exit
 }
