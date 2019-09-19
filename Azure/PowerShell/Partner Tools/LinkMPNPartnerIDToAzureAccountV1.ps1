@@ -1,4 +1,4 @@
-## Name     : LinkPartnerIDAzureAccountsV1.ps1
+## Name     : LinkMPNPartnerIDToAzureAccountV1.ps1
 ## Author   : Jack Tracey - https://jacktracey.co.uk
 ## Version  : 1.0
 
@@ -11,7 +11,7 @@
 # Creating Log File & Starting Transcript
 
 $DateTime = Get-Date -Format dd-MM-yyyy-HHmm
-$LogFileName = 'LinkPartnerIDAzureAccountsV1-Log-' +$DateTime+ '.txt'
+$LogFileName = 'LinkMPNPartnerIDToAzureAccountV1-Log-' +$DateTime+ '.txt'
 
 $LogFile = New-Item -Name "$LogFileName" -ItemType File -ErrorAction Stop
 Start-Transcript -Path $LogFile -ErrorAction Stop
