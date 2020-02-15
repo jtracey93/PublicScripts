@@ -1,0 +1,3 @@
+where type == "microsoft.network/virtualnetworks"
+ | where properties.dhcpOptions.dnsServers[0] != "10.99.1.5"
+ | project vnetName=name, resourceGroup, vnetLocation=location, vnetCIDR=properties.addressSpace.addressPrefixes, vnetDNSServers=properties.dhcpOptions.dnsServers

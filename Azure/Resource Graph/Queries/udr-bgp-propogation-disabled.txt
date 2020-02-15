@@ -1,0 +1,2 @@
+where properties.disableBgpRoutePropagation == "false"
+| project udrName=name, udrLocation=location, subnetsAssociated=properties.subnets
