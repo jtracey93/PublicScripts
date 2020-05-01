@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "rsgName": {
+           "type": "string",
+           "defaultValue": "arm-temp-demo-rsg-001",
+           "metadata": {
+                "description": "RSG Name"
+            }
+        },
+        "primaryRegion": {
+           "type": "string",
+           "defaultValue": "westeurope",
+           "allowedValues": [
+               "westeurope",
+               "northeurope"
+           ],
+           "metadata": {
+                "description": "Priamry Azure Region"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2019-10-01",
+            "name": "[parameters('rsgName')]",
+            "location": "[parameters('primaryRegion')]",
+            "tags": {},
+            "properties": {}
+        }
+    ],
+    "outputs": {}
+}
