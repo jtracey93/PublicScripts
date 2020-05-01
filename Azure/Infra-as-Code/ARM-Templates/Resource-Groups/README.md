@@ -16,4 +16,4 @@ This ARM template will deploy an Azure Resource Group based upon either the defa
 
 ## Deploy Directly To Azure
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com/jtracey93/PublicScripts/master/Azure/Infra-as-Code/ARM-Templates/Resource-Groups/azuredeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fjtracey93%2FPublicScripts%2Fmaster%2FAzure%2FInfra-as-Code%2FARM-Templates%2FResource-Groups%2Fazuredeploy.json)
