@@ -11,5 +11,5 @@ mkdir WVDARMInstall
 Invoke-WebRequest -UseBasicParsing -Uri $WVDAgentDloadUri -OutFile $WVDAgentDloadFileName
 Invoke-WebRequest -UseBasicParsing -Uri $WVDBootloaderDloadUri -OutFile $WVDBootloaderDloadFileName
 
-".\WVDARMAgent.msi REGISTRATIONTOKEN=$WVDHostPoolRegistrationToken /quiet /qn /norestart /passive"
+.\WVDARMAgent.msi "REGISTRATIONTOKEN=$WVDHostPoolRegistrationToken" /quiet /qn /norestart /passive
 .\WVDARMBootloader.msi /quiet /qn /norestart /passive
