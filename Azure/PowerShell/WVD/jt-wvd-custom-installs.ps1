@@ -1,3 +1,5 @@
+param ($WVDHostPoolRegistrationToken)
+
 $WVDAgentDloadUri = 'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv'
 $WVDAgentDloadFileName = 'WVDARMAgent.msi'
 
