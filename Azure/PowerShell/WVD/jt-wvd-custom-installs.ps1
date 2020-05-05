@@ -10,6 +10,8 @@ cd \
 
 mkdir WVDARMInstall
 
+cd WVDARMInstall
+
 Invoke-WebRequest -UseBasicParsing -Uri $WVDAgentDloadUri -OutFile $WVDAgentDloadFileName
 Invoke-WebRequest -UseBasicParsing -Uri $WVDBootloaderDloadUri -OutFile $WVDBootloaderDloadFileName
 
