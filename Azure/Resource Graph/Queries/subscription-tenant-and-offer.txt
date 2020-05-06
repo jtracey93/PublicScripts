@@ -1,0 +1,4 @@
+resourcecontainers |
+where type == "microsoft.resources/subscriptions" |
+extend subOfferId = properties.subscriptionPolicies.quotaId |
+project name, subscriptionId, tenantId, subOfferId
