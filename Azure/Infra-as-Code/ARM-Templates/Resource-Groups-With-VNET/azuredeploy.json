@@ -1,0 +1,104 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "paramRsgName": {
+           "type": "string",
+           "metadata": {
+                "description": "RSG Name"
+            }
+        },
+        "paramPrimaryRegion": {
+           "type": "string",
+           "allowedValues": [
+               "westeurope",
+               "northeurope"
+           ],
+           "metadata": {
+                "description": "Priamry Azure Region"
+            }
+        },
+        "paramVnetName": {
+           "type": "string",
+           "metadata": {
+                "description": "VNET Name"
+            }
+        },
+        "paramVnetCidr": {
+           "type": "string",
+           "metadata": {
+                "description": "VNET CIDR Address Space"
+            }
+        },
+        "paramSubnetName": {
+           "type": "string",
+           "metadata": {
+                "description": "Subnet Name"
+            }
+        },
+        "paramSubnetCidr": {
+           "type": "string",
+           "metadata": {
+                "description": "Subnet CIDR Address Space"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "varRsgName": "[toLower(parameters('paramRsgName'))]",
+        "varVnetName": "[toLower(parameters('paramVnetName'))]",
+        "varSubnetName": "[toLower(concat(parameters('paramVnetName'),'-snet-',parameters('paramSubnetName')))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2019-10-01",
+            "name": "[variables('varRsgName')]",
+            "location": "[parameters('paramPrimaryRegion')]"
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "vnetDeployment",
+            "resourceGroup": "[variables('varRsgName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups/', variables('varRsgName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "functions": [],
+                    "variables": {},
+                    "resources": [
+                        {
+                            "name": "[variables('varVnetName')]",
+                            "type": "Microsoft.Network/virtualNetworks",
+                            "apiVersion": "2019-12-01",
+                            "location": "[parameters('paramPrimaryRegion')]",
+                            "properties": {
+                                "addressSpace": {
+                                    "addressPrefixes": [
+                                        "[parameters('paramVnetCidr')]"
+                                    ]
+                                },
+                                "subnets": [
+                                    {
+                                        "name": "[variables('varSubnetName')]",
+                                        "properties": {
+                                            "addressPrefix": "[parameters('paramSubnetCidr')]"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

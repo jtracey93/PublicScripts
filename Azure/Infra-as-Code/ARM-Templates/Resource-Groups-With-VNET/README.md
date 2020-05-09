@@ -1,4 +1,4 @@
-# ARM - Resource Groups
+# ARM - Resource Groups With VNET (Nested)
 
 | Publicly Shareable? | 
 | ------- | 
@@ -8,12 +8,11 @@
 
 | Date | Notes | Author | 
 | ------- | :---------------------: | -------- |
-| 01/05/2020 | Initial template creation | Jack Tracey |
-| 09/05/2020 | Removed default values from parameters in azuredeploy.json| Jack Tracey |
+| 09/05/2020 | Initial template creation | Jack Tracey |
 
 ## Summary
 
-This ARM template will deploy an Azure Resource Group based upon either the values of the parameters specified at runtime of the *azuredeploy.json* file if used alone or based upon the values in the parameters file if supplied at deployment time *azuredeploy.parameters.json*.
+This ARM template will deploy an Azure Resource Group with a VNET inside based upon either the values of the parameters specified at runtime of the *azuredeploy.json* file if used alone or based upon the values in the parameters file if supplied at deployment time *azuredeploy.parameters.json*.
 
 ## Deploy Directly To Azure
 
