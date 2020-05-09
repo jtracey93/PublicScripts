@@ -4,14 +4,12 @@
     "parameters": {
         "rsgName": {
            "type": "string",
-           "defaultValue": "arm-temp-demo-rsg-001",
            "metadata": {
                 "description": "RSG Name"
             }
         },
         "primaryRegion": {
            "type": "string",
-           "defaultValue": "westeurope",
            "allowedValues": [
                "westeurope",
                "northeurope"
