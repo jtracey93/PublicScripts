@@ -9,6 +9,7 @@
 | Date | Notes | Author | 
 | ------- | :---------------------: | -------- |
 | 01/05/2020 | Initial template creation | Jack Tracey |
+| 09/05/2020 | Removed default values from parameters in azuredeploy.json| Jack Tracey |
 
 ## Summary
 
