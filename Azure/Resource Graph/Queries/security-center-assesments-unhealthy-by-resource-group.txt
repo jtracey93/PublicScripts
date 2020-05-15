@@ -1,0 +1,6 @@
+securityresources
+ | where type =~ 'microsoft.security/assessments' and properties.status.code =~ "Unhealthy"
+ | extend resource = properties.resourceDetails.Id
+ | extend alertName = properties.displayName
+ | project resource, alertName, resourceGroup
+ | summarize count() by resourceGroup
