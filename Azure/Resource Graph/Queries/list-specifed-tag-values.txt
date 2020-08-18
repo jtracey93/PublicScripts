@@ -1,0 +1,9 @@
+## For Subscription or Resource Group scopes ##
+resourcecontainers
+| summarize count() by tostring(tags.YourTagNameHere)
+| project YourTagNameHereTagValues=tags_YourTagNameHere, count_
+
+## For Resources ##
+resources
+| summarize count() by tostring(tags.YourTagNameHere)
+| project YourTagNameHereTagValues=tags_YourTagNameHere, count_
