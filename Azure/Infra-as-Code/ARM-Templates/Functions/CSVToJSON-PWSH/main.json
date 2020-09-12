@@ -1,0 +1,114 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "namePrefix": {
+      "type": "string",
+      "defaultValue": "csvtojson"
+    },
+    "region": {
+      "type": "string",
+      "defaultValue": "northeurope"
+    },
+    "defaultTags": {
+      "type": "object",
+      "defaultValue": {
+        "SourceGitHubRepo": "https://github.com/jtracey93/PublicScripts",
+        "Service": "CSVToJSON PowerShell Function"
+      }
+    }
+  },
+  "functions": [],
+  "variables": {
+    "sacName": "[format('{0}sacfunc001', parameters('namePrefix'))]",
+    "funcappsvcplanname": "[format('{0}appsvcplan001', parameters('namePrefix'))]",
+    "appinsightsname": "[format('{0}appins001', parameters('namePrefix'))]",
+    "funcappname": "[format('{0}funcapp001', parameters('namePrefix'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2019-06-01",
+      "name": "[variables('sacName')]",
+      "location": "[parameters('region')]",
+      "tags": "[parameters('defaultTags')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2019-08-01",
+      "name": "[variables('funcappsvcplanname')]",
+      "location": "[parameters('region')]",
+      "tags": "[parameters('defaultTags')]",
+      "kind": "functionapp",
+      "sku": {
+        "name": "Y1",
+        "tier": "Dynamic"
+      },
+      "properties": {
+        "name": "[variables('funcappsvcplanname')]",
+        "computeMode": "Dynamic"
+      }
+    },
+    {
+      "type": "Microsoft.insights/components",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[variables('appinsightsname')]",
+      "location": "[parameters('region')]",
+      "tags": "[parameters('defaultTags')]",
+      "kind": "web",
+      "properties": {
+        "ApplicationId": "[variables('appinsightsname')]",
+        "Application_Type": "web"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2019-08-01",
+      "name": "[variables('funcappname')]",
+      "location": "[parameters('region')]",
+      "tags": "[parameters('defaultTags')]",
+      "kind": "functionapp",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('funcappsvcplanname'))]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}', variables('sacName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('sacName')), '2019-06-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "powershell"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}', variables('sacName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('sacName')), '2019-06-01').keys[0].value)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[variables('funcappname')]"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.insights/components', variables('appinsightsname'))).InstrumentationKey]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.insights/components', variables('appinsightsname'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('funcappsvcplanname'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('sacName'))]"
+      ]
+    }
+  ],
+  "outputs": {}
+}
