@@ -8,6 +8,9 @@
 ## You will need to run the first step of this script and then wait for 30 minutes for the elevated permissions to take effect, you will also need to clear the Azure Context from the PowerShell session and re-authenticate to continue.
 ## *NOTES END*
 
+## *DISCLAIMER*
+## This PowerShell Script is provided as is and is not an official supported script by Microsoft
+
 # Initial Login To Azure - Login as Glboal Admin of AAD Tenant
 
 Write-Host -ForegroundColor Yellow "Login to Azure"
