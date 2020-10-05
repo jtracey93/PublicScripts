@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "namePrefix": {
+            "value": "acme"
+        },
+        "region": {
+            "value": "northeurope"
+        },
+        "defaultTags": {
+            "value": {
+              "SourceGitHubRepo": "https://github.com/jtracey93/PublicScripts",
+              "Service": "2 VNETs With Peering Same Resource Group"
+            }
+        }
+    }
+}
