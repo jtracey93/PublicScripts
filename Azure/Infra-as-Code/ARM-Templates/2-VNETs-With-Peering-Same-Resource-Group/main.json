@@ -1,0 +1,115 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "namePrefix": {
+      "type": "string",
+      "defaultValue": "acme"
+    },
+    "region": {
+      "type": "string",
+      "defaultValue": "northeurope"
+    },
+    "defaultTags": {
+      "type": "object",
+      "defaultValue": {
+        "SourceGitHubRepo": "https://github.com/jtracey93/PublicScripts",
+        "Service": "2 VNETs With Peering Same Resource Group"
+      }
+    }
+  },
+  "functions": [],
+  "variables": {
+    "vnet1Name": "[format('{0}-vnet-001', parameters('namePrefix'))]",
+    "vnet2Name": "[format('{0}-vnet-002', parameters('namePrefix'))]",
+    "vnet1CIDR": "10.1.0.0/16",
+    "vnet1Subnet1CIDR": "10.1.0.0/24",
+    "vnet2CIDR": "10.2.0.0/16",
+    "vnet2Subnet1CIDR": "10.2.0.0/24"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2020-05-01",
+      "name": "[variables('vnet1Name')]",
+      "location": "[parameters('region')]",
+      "tags": "[parameters('defaultTags')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('vnet1CIDR')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[format('{0}-subnet-001', variables('vnet1Name'))]",
+            "properties": {
+              "addressPrefix": "[variables('vnet1Subnet1CIDR')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2020-05-01",
+      "name": "[variables('vnet2Name')]",
+      "location": "[parameters('region')]",
+      "tags": "[parameters('defaultTags')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('vnet2CIDR')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[format('{0}-subnet-001', variables('vnet2Name'))]",
+            "properties": {
+              "addressPrefix": "[variables('vnet2Subnet1CIDR')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}/vnet-peer-{1}-to-{2}', variables('vnet1Name'), variables('vnet1Name'), variables('vnet2Name'))]",
+      "location": "[parameters('region')]",
+      "properties": {
+        "allowVirtualNetworkAccess": true,
+        "allowForwardedTraffic": false,
+        "allowGatewayTransit": false,
+        "useRemoteGateways": false,
+        "remoteVirtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet2Name'))]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet1Name'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet2Name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+      "apiVersion": "2020-05-01",
+      "name": "[format('{0}/vnet-peer-{1}-to-{2}', variables('vnet2Name'), variables('vnet2Name'), variables('vnet1Name'))]",
+      "location": "[parameters('region')]",
+      "properties": {
+        "allowVirtualNetworkAccess": true,
+        "allowForwardedTraffic": false,
+        "allowGatewayTransit": false,
+        "useRemoteGateways": false,
+        "remoteVirtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet1Name'))]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet1Name'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet2Name'))]"
+      ]
+    }
+  ],
+  "outputs": {}
+}
