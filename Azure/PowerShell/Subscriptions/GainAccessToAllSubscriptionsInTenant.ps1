@@ -3,7 +3,7 @@
 ## Version  : 1.0
 
 ## *NOTES START*
-## This PowerShell script will find grant an account, entered during the script runtime, Owner RBAC permission s to the Root Management Group in an Azure AD Tenant - Scope '/'.
+## This PowerShell script will grant an account, entered during the script runtime, Owner RBAC permission's to the Root Management Group in an Azure AD Tenant - Scope '/'.
 ## The script will also enable Management Groups on the Azure AD Tenant if they are note already enabled!
 ## This PowerShell script needs to be run by an Azure AD Global Administrator on the Azure AD Tenant you wish to discover the subscriptions for.
 ## You will need to run the first step of this script and then wait for 15 minutes for the elevated permissions to take effect, you will also need to clear the Azure Context from the PowerShell session and re-authenticate to continue.
