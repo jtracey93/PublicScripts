@@ -20,7 +20,10 @@
                 "allowedValues": [
                     "Monthly",
                     "Quarterly",
-                    "Annually"
+                    "Annually",
+                    "BillingMonth",
+                    "BillingQuarter",
+                    "BillingAnnual"
                 ],
                 "metadata": {
                     "description": "The time covered by a budget. Tracking of the amount will be reset based on the time grain."
@@ -137,7 +140,7 @@
                                     },
                                     "startDate": {
                                         "type": "string",
-                                        "defaultValue": "[utcNow('d')]"
+                                        "defaultValue": "[concat(utcNow('MM'), '/01/', utcNow('yyyy'))]"
                                     }
                                 },
                                 "resources": [
