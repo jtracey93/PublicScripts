@@ -1,7 +1,7 @@
 {
     "properties": {
         "displayName": "Deploy default budget for all subscriptions",
-        "mode": "Indexed",
+        "mode": "All",
         "description": "This policy creates a default sandbox budget in all subscriptions if one does not exist.",
         "metadata": {
             "category": "General"
@@ -52,12 +52,14 @@
             },
             "contactEmails": {
                 "type": "array",
+                "defaultValue": [],
                 "metadata": {
                     "description": "The list of email addresses to send the budget notification to when the threshold is exceeded."
                 }
             },
             "contactGroups": {
                 "type": "array",
+                "defaultValue": [],
                 "metadata": {
                     "description": "The list of action groups to send the budget notification to when the threshold is exceeded. It accepts array of strings."
                 }
