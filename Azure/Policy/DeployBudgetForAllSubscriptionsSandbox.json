@@ -1,8 +1,8 @@
 {
     "properties": {
-        "displayName": "Deploy default budget for all subscriptions",
+        "displayName": "Deploy default budget for all subscriptions - Sandbox",
         "mode": "All",
-        "description": "This policy creates a default budget in all subscriptions if one does not exist.",
+        "description": "This policy creates a default sandbox budget in all subscriptions if one does not exist. For use with Enterprise Scale or a Management Group for grouping Sandbox subscriptions.",
         "metadata": {
             "category": "General"
         },
@@ -85,6 +85,10 @@
                     "existenceScope": "Subscription",
                     "existenceCondition": {
                         "allOf": [
+                            {
+                                "field": "Microsoft.Consumption/budgets/amount",
+                                "equals": "[parameters('amount')]"
+                            },
                             {
                                 "field": "Microsoft.Consumption/budgets/timeGrain",
                                 "equals": "[parameters('timeGrain')]"
