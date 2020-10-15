@@ -83,6 +83,22 @@
                     "type": "Microsoft.Consumption/budgets",
                     "deploymentScope": "Subscription",
                     "existenceScope": "Subscription",
+                    "existenceCondition": {
+                        "allOf": [
+                            {
+                                "field": "Microsoft.Consumption/budgets/amount",
+                                "equals": "[parameters('amount')]"
+                            },
+                            {
+                                "field": "Microsoft.Consumption/budgets/timeGrain",
+                                "equals": "[parameters('timeGrain')]"
+                            },
+                            {
+                                "field": "Microsoft.Consumption/budgets/category",
+                                "equals": "Cost"
+                            }
+                        ]
+                    },
                     "roleDefinitionIds": [
                         "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
                     ],
