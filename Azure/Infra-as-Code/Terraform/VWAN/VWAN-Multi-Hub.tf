@@ -27,11 +27,9 @@ resource "azurerm_resource_group" "weu-rsg-vwan-001" {
 }
 
 resource "azurerm_virtual_hub" "vwan-001-hub-weu" {
-  provider            = azurerm.connectivity
   name                = "weu-vwan-hub-001"
   resource_group_name = azurerm_resource_group.weu-rsg-vwan-001.name
   location            = azurerm_resource_group.weu-rsg-vwan-001.location
-  tags                = var.defaultTags
 
   virtual_wan_id = azurerm_virtual_wan.vwan-001.id
   address_prefix = "10.255.2.0/24"
