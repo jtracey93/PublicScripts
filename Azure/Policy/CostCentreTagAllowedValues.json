@@ -3,7 +3,7 @@
         "displayName": "Allowed CostCentre Tag Values",
         "policyType": "Custom",
         "mode": "All",
-        "description": "Only allows specificed CostCentre tag values.",
+        "description": "Only allows specified CostCentre tag values.",
         "metadata": {
             "category": "Tags"
         },
