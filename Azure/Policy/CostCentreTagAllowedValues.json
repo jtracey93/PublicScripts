@@ -1,0 +1,37 @@
+{
+    "properties": {
+        "displayName": "Allowed CostCentre Tag Values",
+        "policyType": "Custom",
+        "mode": "All",
+        "description": "Only allows specificed CostCentre tag values.",
+        "metadata": {
+            "category": "Tags"
+        },
+        "parameters": {
+            "paramCostCentreTagValues": {
+                "type": "Array",
+                "metadata": {
+                    "displayName": "paramCostCentreTagValues",
+                    "description": "Allowed values for the CostCentre Tag"
+                }
+            }
+        },
+        "policyRule": {
+            "if": {
+                "allof": [
+                    {
+                        "field": "tags.CostCentre",
+                        "notin": "[parameters('paramCostCentreTagValues')]"
+                    },
+                    {
+                        "field": "type",
+                        "notEquals": "Microsoft.Authorization/policyAssignments"
+                    }
+                ]
+            },
+            "then": {
+                "effect": "deny"
+            }
+        }
+    }
+}
