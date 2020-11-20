@@ -2,7 +2,7 @@
     "properties": {
         "displayName": "Allowed CostCentre Tag Values",
         "policyType": "Custom",
-        "mode": "All",
+        "mode": "Indexed",
         "description": "Only allows specified CostCentre tag values.",
         "metadata": {
             "category": "Tags"
@@ -22,10 +22,6 @@
                     {
                         "field": "tags.CostCentre",
                         "notin": "[parameters('paramCostCentreTagValues')]"
-                    },
-                    {
-                        "field": "type",
-                        "notEquals": "Microsoft.Authorization/policyAssignments"
                     }
                 ]
             },
