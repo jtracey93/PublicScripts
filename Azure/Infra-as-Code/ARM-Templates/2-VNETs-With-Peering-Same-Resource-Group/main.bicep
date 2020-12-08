@@ -48,6 +48,9 @@ resource vnet2 'Microsoft.Network/virtualNetworks@2020-05-01' = {
               name: '${vnet2Name}-subnet-001'
               properties: {
                   addressPrefix: vnet2Subnet1CIDR
+                  natGateway: {
+                    id: natGateway.id
+                  }
               }
           }
       ]
@@ -80,4 +83,14 @@ resource vnet2To1Peering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerin
           id: vnet1.id
       }
     }
+  }
+
+  resource natGateway 'Microsoft.Network/natGateways@2020-06-01' = {
+    name: '${namePrefix}-natgw-01'
+    location: region
+    sku: {
+      name: 'Standard'
+    }
+    tags: defaultTags
+
   }

@@ -1,0 +1,378 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "namingPrefix": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "defaultTags": {
+      "type": "object",
+      "defaultValue": {
+        "SourceGitHubRepo": "https://github.com/jtracey93/PublicScripts",
+        "Service": "Resource Group With VNET - Bicep"
+      }
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2020-06-01",
+      "name": "[format('rsg-{0}-{1}-hub', parameters('region'), parameters('namingPrefix'))]",
+      "location": "[parameters('region')]",
+      "tags": "[parameters('defaultTags')]"
+    },
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2020-06-01",
+      "name": "[format('rsg-{0}-{1}-spoke', parameters('region'), parameters('namingPrefix'))]",
+      "location": "[parameters('region')]",
+      "tags": "[parameters('defaultTags')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "hub-vnet-deploy",
+      "resourceGroup": "[format('rsg-{0}-{1}-hub', parameters('region'), parameters('namingPrefix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "namingPrefix": {
+            "value": "[parameters('namingPrefix')]"
+          },
+          "namingEnvironment": {
+            "value": "hub"
+          },
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "defaultTags": {
+            "value": "[parameters('defaultTags')]"
+          },
+          "addressSpace": {
+            "value": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": {
+            "value": [
+              {
+                "name": "[format('snet-{0}-hub-infra', parameters('namingPrefix'))]",
+                "properties": {
+                  "addressPrefix": "10.0.0.0/24"
+                }
+              },
+              {
+                "name": "[format('snet-{0}-hub-dmz', parameters('namingPrefix'))]",
+                "properties": {
+                  "addressPrefix": "10.0.250.0/24"
+                }
+              }
+            ]
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "namingPrefix": {
+              "type": "string"
+            },
+            "namingEnvironment": {
+              "type": "string"
+            },
+            "region": {
+              "type": "string"
+            },
+            "defaultTags": {
+              "type": "object"
+            },
+            "addressSpace": {
+              "type": "array"
+            },
+            "subnets": {
+              "type": "array"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2020-06-01",
+              "name": "[format('vnet-{0}-{1}-{2}', parameters('region'), parameters('namingPrefix'), parameters('namingEnvironment'))]",
+              "location": "[parameters('region')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": "[parameters('addressSpace')]"
+                },
+                "subnets": "[parameters('subnets')]"
+              }
+            }
+          ],
+          "outputs": {
+            "vnetName": {
+              "type": "string",
+              "value": "[format('vnet-{0}-{1}-{2}', parameters('region'), parameters('namingPrefix'), parameters('namingEnvironment'))]"
+            },
+            "vnetID": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/virtualNetworks', format('vnet-{0}-{1}-{2}', parameters('region'), parameters('namingPrefix'), parameters('namingEnvironment')))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('rsg-{0}-{1}-hub', parameters('region'), parameters('namingPrefix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "spoke-vnet-deploy",
+      "resourceGroup": "[format('rsg-{0}-{1}-spoke', parameters('region'), parameters('namingPrefix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "namingPrefix": {
+            "value": "[parameters('namingPrefix')]"
+          },
+          "namingEnvironment": {
+            "value": "spoke"
+          },
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "defaultTags": {
+            "value": "[parameters('defaultTags')]"
+          },
+          "addressSpace": {
+            "value": [
+              "10.1.0.0/16"
+            ]
+          },
+          "subnets": {
+            "value": [
+              {
+                "name": "[format('snet-{0}-spoke-infra', parameters('namingPrefix'))]",
+                "properties": {
+                  "addressPrefix": "10.1.0.0/24"
+                }
+              },
+              {
+                "name": "[format('snet-{0}-spoke-dmz', parameters('namingPrefix'))]",
+                "properties": {
+                  "addressPrefix": "10.1.250.0/24"
+                }
+              }
+            ]
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "namingPrefix": {
+              "type": "string"
+            },
+            "namingEnvironment": {
+              "type": "string"
+            },
+            "region": {
+              "type": "string"
+            },
+            "defaultTags": {
+              "type": "object"
+            },
+            "addressSpace": {
+              "type": "array"
+            },
+            "subnets": {
+              "type": "array"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2020-06-01",
+              "name": "[format('vnet-{0}-{1}-{2}', parameters('region'), parameters('namingPrefix'), parameters('namingEnvironment'))]",
+              "location": "[parameters('region')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": "[parameters('addressSpace')]"
+                },
+                "subnets": "[parameters('subnets')]"
+              }
+            }
+          ],
+          "outputs": {
+            "vnetName": {
+              "type": "string",
+              "value": "[format('vnet-{0}-{1}-{2}', parameters('region'), parameters('namingPrefix'), parameters('namingEnvironment'))]"
+            },
+            "vnetID": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/virtualNetworks', format('vnet-{0}-{1}-{2}', parameters('region'), parameters('namingPrefix'), parameters('namingEnvironment')))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('rsg-{0}-{1}-spoke', parameters('region'), parameters('namingPrefix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "hub-to-spoke-peering",
+      "resourceGroup": "[format('rsg-{0}-{1}-hub', parameters('region'), parameters('namingPrefix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "allowForwardedTraffic": {
+            "value": false
+          },
+          "allowVirtualNetworkAccess": {
+            "value": true
+          },
+          "localVnetName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rsg-{0}-{1}-hub', parameters('region'), parameters('namingPrefix'))), 'Microsoft.Resources/deployments', 'hub-vnet-deploy'), '2019-10-01').outputs.vnetName.value]"
+          },
+          "remoteVnetName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rsg-{0}-{1}-spoke', parameters('region'), parameters('namingPrefix'))), 'Microsoft.Resources/deployments', 'spoke-vnet-deploy'), '2019-10-01').outputs.vnetName.value]"
+          },
+          "remoteVnetId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rsg-{0}-{1}-spoke', parameters('region'), parameters('namingPrefix'))), 'Microsoft.Resources/deployments', 'spoke-vnet-deploy'), '2019-10-01').outputs.vnetID.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "localVnetName": {
+              "type": "string"
+            },
+            "remoteVnetName": {
+              "type": "string"
+            },
+            "remoteVnetId": {
+              "type": "string"
+            },
+            "allowForwardedTraffic": {
+              "type": "bool"
+            },
+            "allowVirtualNetworkAccess": {
+              "type": "bool"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+              "apiVersion": "2020-06-01",
+              "name": "[format('{0}/to-{1}-peering', parameters('localVnetName'), parameters('remoteVnetName'))]",
+              "properties": {
+                "allowForwardedTraffic": "[parameters('allowForwardedTraffic')]",
+                "allowVirtualNetworkAccess": "[parameters('allowVirtualNetworkAccess')]",
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteVirtualNetwork": {
+                  "id": "[parameters('remoteVnetId')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rsg-{0}-{1}-hub', parameters('region'), parameters('namingPrefix'))), 'Microsoft.Resources/deployments', 'hub-vnet-deploy')]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('rsg-{0}-{1}-hub', parameters('region'), parameters('namingPrefix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rsg-{0}-{1}-spoke', parameters('region'), parameters('namingPrefix'))), 'Microsoft.Resources/deployments', 'spoke-vnet-deploy')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "spoke-to-hub-peering",
+      "resourceGroup": "[format('rsg-{0}-{1}-spoke', parameters('region'), parameters('namingPrefix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "allowForwardedTraffic": {
+            "value": false
+          },
+          "allowVirtualNetworkAccess": {
+            "value": true
+          },
+          "localVnetName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rsg-{0}-{1}-spoke', parameters('region'), parameters('namingPrefix'))), 'Microsoft.Resources/deployments', 'spoke-vnet-deploy'), '2019-10-01').outputs.vnetName.value]"
+          },
+          "remoteVnetName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rsg-{0}-{1}-hub', parameters('region'), parameters('namingPrefix'))), 'Microsoft.Resources/deployments', 'hub-vnet-deploy'), '2019-10-01').outputs.vnetName.value]"
+          },
+          "remoteVnetId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rsg-{0}-{1}-hub', parameters('region'), parameters('namingPrefix'))), 'Microsoft.Resources/deployments', 'hub-vnet-deploy'), '2019-10-01').outputs.vnetID.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "localVnetName": {
+              "type": "string"
+            },
+            "remoteVnetName": {
+              "type": "string"
+            },
+            "remoteVnetId": {
+              "type": "string"
+            },
+            "allowForwardedTraffic": {
+              "type": "bool"
+            },
+            "allowVirtualNetworkAccess": {
+              "type": "bool"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+              "apiVersion": "2020-06-01",
+              "name": "[format('{0}/to-{1}-peering', parameters('localVnetName'), parameters('remoteVnetName'))]",
+              "properties": {
+                "allowForwardedTraffic": "[parameters('allowForwardedTraffic')]",
+                "allowVirtualNetworkAccess": "[parameters('allowVirtualNetworkAccess')]",
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteVirtualNetwork": {
+                  "id": "[parameters('remoteVnetId')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rsg-{0}-{1}-hub', parameters('region'), parameters('namingPrefix'))), 'Microsoft.Resources/deployments', 'hub-vnet-deploy')]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('rsg-{0}-{1}-spoke', parameters('region'), parameters('namingPrefix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rsg-{0}-{1}-spoke', parameters('region'), parameters('namingPrefix'))), 'Microsoft.Resources/deployments', 'spoke-vnet-deploy')]"
+      ]
+    }
+  ]
+}
