@@ -1,0 +1,28 @@
+{
+    "properties": {
+        "description": "Denies creation of VNET Peerings outside of a single subscription boundary for all subscriptions under the assigned scope.",
+        "displayName": "Deny-VNET-Peering-Cross-Subscription",
+        "mode": "All",
+        "metadata": {
+            "category": "Cost"
+        },
+        "parameters": {},
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings"
+                    },
+                    {
+                        "field": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/remoteVirtualNetwork.id",
+                        "notcontains": "[subscription().id]"
+                    }
+                ]
+            },
+            "then": {
+                "effect": "deny"
+            }
+        }
+    }
+}
