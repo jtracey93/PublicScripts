@@ -1,7 +1,7 @@
 {
     "properties": {
         "description": "Denies creation of VNET Peerings outside of a single subscription boundary for all subscriptions under the assigned scope.",
-        "displayName": "Deny-VNET-Peering-Cross-Subscription",
+        "displayName": "Deny-VNET-Peer-Cross-Sub",
         "mode": "All",
         "metadata": {
             "category": "Cost"
