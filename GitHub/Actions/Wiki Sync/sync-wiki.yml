@@ -1,0 +1,60 @@
+name: Sync Wiki
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/wiki/**"
+
+env:
+  wiki_source_repo: "MyOrg/MyRepo"
+  wiki_source_repo_dir: "MyOrg/MyRepo/docs/wiki"
+  wiki_target_repo: "MyOrg/MyRepo.wiki"
+  github_user_name: "github-actions"
+  github_email: "github-actions@github.com"
+  github_commit_message: "GitHub Action syncing wiki from docs/wiki"
+
+
+jobs:
+  sync-wiki:
+    name: Sync Wiki
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Source Repo
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.wiki_source_repo }}
+          path: ${{ env.wiki_source_repo }}
+
+      - name: Checkout Wiki Repo
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.wiki_target_repo }}
+          path: ${{ env.wiki_target_repo }}
+                
+      - name: Configure Local Git
+        run: |
+          git config --global user.name $github_user_name
+          git config --global user.email $github_email
+        working-directory: ${{ env.GITHUB_WORKSPACE }}
+          
+      - name: Cleanup Wiki Repo
+        run: |
+          find -not -path "./.git/*" -not -name ".git" -delete
+        working-directory: ${{ env.wiki_target_repo }}
+      
+      - name: Copy docs/wiki Into Wiki Repo
+        run: |
+          cd $wiki_source_repo_dir
+          cp -rf . ../../../../$wiki_target_repo
+        working-directory: ${{ env.GITHUB_WORKSPACE }}
+
+      - name: Stage & Push Files Into Wiki Repo
+        run: |
+          git add .
+          git commit -m "$github_commit_message"
+          git push --set-upstream https://$GITHUB_TOKEN@github.com/$wiki_target_repo.git master 
+        working-directory: ${{ env.wiki_target_repo }}
+          
