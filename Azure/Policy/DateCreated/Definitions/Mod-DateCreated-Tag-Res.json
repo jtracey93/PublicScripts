@@ -1,0 +1,45 @@
+{
+ "properties": {
+  "displayName": "Add Date Created Tag - Resources",
+  "policyType": "Custom",
+  "mode": "Indexed",
+  "description": "This policy adds a date created tag to all supported resources.",
+  "metadata": {
+   "category": "Tags",
+   "version": "1.0.0"
+  },
+  "parameters": {
+   "tagName": {
+    "type": "String",
+    "metadata": {
+     "displayName": "Tag Name",
+     "description": "Name of the tag, such as 'DateCreated'"
+    },
+    "defaultValue": "DateCreated"
+   }
+  },
+  "policyRule": {
+   "if": {
+    "field": "[concat('tags[', parameters('tagName'), ']')]",
+    "exists": "false"
+   },
+   "then": {
+    "effect": "modify",
+    "details": {
+     "roleDefinitionIds": [
+      "/providers/microsoft.authorization/roleDefinitions/4a9ae827-6dc8-4573-8ac7-8239d42aa03f"
+     ],
+     "operations": [
+      {
+       "operation": "add",
+       "field": "[concat('tags[', parameters('tagName'), ']')]",
+       "value": "[concat(substring(utcNow(),8,2), '/', substring(utcNow(),5,2), '/', substring(utcNow(),0,4))]"
+      }
+     ]
+    }
+   }
+  }
+ },
+ "type": "Microsoft.Authorization/policyDefinitions",
+ "name": "Mod-DateCreated-Tag-Res"
+}

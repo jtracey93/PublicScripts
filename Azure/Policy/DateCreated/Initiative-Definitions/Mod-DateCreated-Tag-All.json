@@ -1,0 +1,46 @@
+{
+ "properties": {
+  "displayName": "Add Date Tag - All Resources & Resource Groups",
+  "policyType": "Custom",
+  "description": "Add Date Tag using UTC Now for All Resources & Resource Groups",
+  "metadata": {
+   "category": "Tags",
+   "version": "1.0.0"
+  },
+  "parameters": {
+   "tagName": {
+    "type": "string",
+    "metadata": {
+     "displayName": "Tag Name",
+     "description": "Name of the tag, such as 'DateCreated'"
+    },
+    "defaultValue": "DateCreated"
+   }
+  },
+  "policyDefinitions": [
+   {
+    "policyDefinitionReferenceId": "Add Date Created Tag - Resource Group_1",
+    "policyDefinitionId": "REPLACE-ME-WITH-DEFINITION-RESOURCE-ID-OF-Mod-DateCreated-Tag-RSGs.json",
+    "parameters": {
+     "tagName": {
+      "value": "[parameters('tagName')]"
+     }
+    },
+    "groupNames": []
+   },
+   {
+    "policyDefinitionReferenceId": "Add Date Created Tag - Resources_1",
+    "policyDefinitionId": "REPLACE-ME-WITH-DEFINITION-RESOURCE-ID-OF-Mod-DateCreated-Tag-Res.json",
+    "parameters": {
+     "tagName": {
+      "value": "[parameters('tagName')]"
+     }
+    },
+    "groupNames": []
+   }
+  ],
+  "policyDefinitionGroups": []
+ },
+ "type": "Microsoft.Authorization/policySetDefinitions",
+ "name": "Mod-DateCreated-Tag-All"
+}
