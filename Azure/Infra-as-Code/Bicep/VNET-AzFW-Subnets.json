@@ -1,0 +1,172 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.63.48766",
+      "templateHash": "928430002625824975"
+    }
+  },
+  "parameters": {
+    "region": {
+      "type": "string",
+      "defaultValue": "uksouth",
+      "metadata": {
+        "description": "Azure Region to deploy to - use CLI name e.g. \"uksouth\""
+      }
+    },
+    "namingPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Naming prefix to use for resources."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+        "IaC-Source": "jtracey93/PublicScripts",
+        "DemoOf": "Azure Firewall Subnet Restriction Testing"
+      }
+    },
+    "vnetCIDR": {
+      "type": "array",
+      "defaultValue": [
+        "10.0.0.0/16"
+      ]
+    },
+    "subnetAzFwCIDR": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/24"
+    },
+    "subnetAzFwMgmtCIDR": {
+      "type": "string",
+      "defaultValue": "10.0.2.0/24"
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[format('rsg-{0}-azfw-testing', parameters('namingPrefix'))]",
+      "location": "[parameters('region')]",
+      "tags": "[parameters('tags')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "VNetDeploy",
+      "resourceGroup": "[format('rsg-{0}-azfw-testing', parameters('namingPrefix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "namingPrefix": {
+            "value": "[parameters('namingPrefix')]"
+          },
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          },
+          "vnetCIDR": {
+            "value": "[parameters('vnetCIDR')]"
+          },
+          "subnetAzFwCIDR": {
+            "value": "[parameters('subnetAzFwCIDR')]"
+          },
+          "subnetAzFwMgmtCIDR": {
+            "value": "[parameters('subnetAzFwMgmtCIDR')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "13513702803558843563"
+            }
+          },
+          "parameters": {
+            "region": {
+              "type": "string",
+              "defaultValue": "uksouth",
+              "metadata": {
+                "description": "Azure Region to deploy to - use CLI name e.g. \"uksouth\""
+              }
+            },
+            "namingPrefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Naming prefix to use for resources."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {
+                "IaC-Source": "jtracey93/PublicScripts",
+                "DemoOf": "Azure Firewall Subnet Restriction Testing"
+              }
+            },
+            "vnetCIDR": {
+              "type": "array"
+            },
+            "subnetAzFwCIDR": {
+              "type": "string"
+            },
+            "subnetAzFwMgmtCIDR": {
+              "type": "string"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2021-02-01",
+              "name": "[format('vnet-{0}-azfw-testing', parameters('namingPrefix'))]",
+              "location": "[parameters('region')]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": "[parameters('vnetCIDR')]"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks/subnets",
+              "apiVersion": "2021-02-01",
+              "name": "[format('{0}/{1}', format('vnet-{0}-azfw-testing', parameters('namingPrefix')), 'AzureFirewallSubnet')]",
+              "properties": {
+                "addressPrefix": "[parameters('subnetAzFwCIDR')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', format('vnet-{0}-azfw-testing', parameters('namingPrefix')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks/subnets",
+              "apiVersion": "2021-02-01",
+              "name": "[format('{0}/{1}', format('vnet-{0}-azfw-testing', parameters('namingPrefix')), 'AzureFirewallManagementSubnet')]",
+              "properties": {
+                "addressPrefix": "[parameters('subnetAzFwMgmtCIDR')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', format('vnet-{0}-azfw-testing', parameters('namingPrefix')), 'AzureFirewallSubnet')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', format('vnet-{0}-azfw-testing', parameters('namingPrefix')))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('rsg-{0}-azfw-testing', parameters('namingPrefix')))]"
+      ]
+    }
+  ]
+}
