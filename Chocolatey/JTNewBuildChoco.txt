@@ -1,0 +1,40 @@
+# Install Chocolatey
+
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+# Install Apps & Fonts
+choco install microsoft-edge-insider-dev -y
+choco install vscode -y
+choco install pwsh -y
+choco install git -y
+choco install notepadplusplus -y
+choco install adobereader -y
+choco install vlc -y
+choco install python -y
+choco install putty -y
+choco install winscp -y
+choco install filezilla -y
+choco install 7zip -y
+choco install azure-cli -y
+choco install microsoftazurestorageexplorer -y
+choco install azcopy10 -y
+choco install cascadiafonts -y
+
+# Git Config Setup
+git config --global user.name "Jack Tracey"
+git config --global user.email "jack@jacktracey.co.uk"
+git config --global core.editor "code --wait"
+
+# Install PowerShell Modules
+Install-Module Az
+Install-Module posh-git -Scope CurrentUser
+Install-Module oh-my-posh -Scope CurrentUser
+Install-Module -Name PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
+Install-Module -Name Terminal-Icons -Repository PSGallery
+
+# Terminal Config
+code $PROFILE
+#Import-Module posh-git
+#Import-Module oh-my-posh
+#Set-PoshPrompt -Theme Paradox
+#Import-Module -Name Terminal-Icons
