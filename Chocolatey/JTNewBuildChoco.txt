@@ -18,6 +18,20 @@ choco install 7zip -y
 choco install azure-cli -y
 choco install microsoftazurestorageexplorer -y
 choco install azcopy10 -y
+choco install sonos-controller -y
+choco install powertoys -y
+choco install postman -y
+choco install terraform -y
+choco install sysinternals -y
+choco install hugo -y
+choco install jq -y
+choco install zoomit -y
+choco install tree -y
+choco install gh -y
+choco install dropbox -y
+choco install advanced-ip-scanner -y
+choco install camtasia -y
+choco install snagit -y
 choco install cascadiafonts -y
 
 # Git Config Setup
