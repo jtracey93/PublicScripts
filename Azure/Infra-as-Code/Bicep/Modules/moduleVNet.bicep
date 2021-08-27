@@ -1,52 +1,69 @@
 targetScope = 'resourceGroup'
 
-@description('Azure Region to deploy to - use CLI name e.g. "uksouth"')
+@description('Azure region to deploy to')
 param region string = 'uksouth'
 
-@description('Naming prefix to use for resources.')
-param namingPrefix string
+@description('Azure region naming prefix')
+param regionNamePrefix string = 'uks'
 
-param tags object = {
+@description('Tags to apply to applicable resoruces')
+param defaultTags object = {
   'IaC-Source': 'jtracey93/PublicScripts'
-  DemoOf: 'Azure Firewall Subnet Restriction Testing'
 }
 
-param vnetCIDR array
+@description('Array of VNET objects, including and array of Subnets.')
+param vnets array = [
+  {
+    name: 'vnet-uks-1'
+    cidr: '10.1.0.0/16'
+    subnets: [
+      {
+        name: 'AzureBastionSubnet'
+        properties: {
+          addressPrefix: '10.1.0.0/24'
+        }
+      }
+    ]
+    deployBastion: 'yes'
+  }
+  {
+    name: 'vnet-uks-2'
+    cidr: '10.2.0.0/16'
+    subnets: [
+      {
+        name: 'subnet-1'
+        properties: {
+          addressPrefix: '10.2.0.0/24'
+        }
+      }
+      {
+        name: 'subnet-2'
+        properties: {
+          addressPrefix: '10.2.1.0/24'
+        }
+      }
+    ]
+    deployBastion: 'no'
+  }
+  {
+    name: 'vnet-uks-3'
+    cidr: '10.3.0.0/16'
+    subnets: []
+    deployBastion: 'no'
+  }
+]
 
-param subnetAzFwCIDR string
 
-param subnetAzFwMgmtCIDR string
-
-resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' = {
-  name: 'vnet-${namingPrefix}-azfw-testing'
+resource resVNETs 'Microsoft.Network/virtualNetworks@2021-02-01' = [for vnet in vnets: {
+  name: vnet.name
   location: region
-  tags: tags
-
+  tags: defaultTags
   properties: {
     addressSpace: {
-      addressPrefixes: vnetCIDR
+      addressPrefixes: [
+        vnet.cidr
+      ]
     }
+    subnets: vnet.subnets
   }
-}
-
-resource subnetAzFw 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
-  parent: vnet
-  name: 'AzureFirewallSubnet'
-  properties: {
-    addressPrefix: subnetAzFwCIDR
-  }
-  dependsOn: [
-    vnet
-  ]
-}
-
-resource subnetAzFwMgmt 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
-  parent: vnet
-  name: 'AzureFirewallManagementSubnet'
-  properties: {
-    addressPrefix: subnetAzFwMgmtCIDR
-  }
-  dependsOn: [
-    subnetAzFw
-  ]
-}
+}]
