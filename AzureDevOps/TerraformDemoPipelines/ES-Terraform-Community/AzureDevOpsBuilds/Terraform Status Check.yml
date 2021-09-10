@@ -1,0 +1,89 @@
+pool:
+  name: Azure Pipelines
+variables:
+- group: Terraform-Variable-Group
+- name: system.debug
+  value: false
+steps:
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+  displayName: Install Terraform 0.14.6
+  inputs:
+    terraformVersion: 0.14.6
+- task: CmdLine@2
+  displayName: Terraform Init
+  inputs:
+    script: terraform init -backend-config="access_key=$(jtmsneusacesterraform001-key1)"
+    workingDirectory: terraform
+- task: CmdLine@2
+  displayName: Terraform Validate
+  inputs:
+    script: terraform validate
+    workingDirectory: terraform
+- task: CmdLine@2
+  displayName: Terraform Plan
+  inputs:
+    script: terraform plan -input=false -out=tfplan -var="spn-client-id=$(nstar-tenant-tf-spn-client-id)" -var="spn-client-secret=$(nstar-tenant-tf-spn-secret)" -var="spn-tenant-id=$(nstar-tenant-tf-spn-tenant-id)"
+    workingDirectory: terraform
+- task: CmdLine@2
+  displayName: Terraform Show & Create JSON tfplan
+  inputs:
+    script: terraform show -json tfplan > ..\pwsh\tfplan.json
+    workingDirectory: terraform
+- task: PowerShell@2
+  displayName: Terraform Annotate
+  inputs:
+    targetType: inline
+    filePath: pwsh/tfAnnotate.ps1
+    arguments: -JsonPlanPath .\tfplan.json
+    script: |
+      $json = Get-Content ./tfplan.json | ConvertFrom-Json
+      $changes = $json.resource_changes `
+      | Where-Object { ($_.change.actions[0] -ne 'no-op') -and ($_.change.actions[0] -ne 'read') }
+
+      function ToIcon($action) {
+          switch ($action) {
+              "create" { ":heavy_plus_sign:" }
+              "update" { ":pencil2:" }
+              "delete" { ":x:" }
+              Default { return $action }
+          }
+      }
+
+      $request = @{ comments = New-Object Collections.ArrayList; status = "active" }
+
+      if (-not $changes) {
+          $comment = @{ content = "**Terraform Plan changes summary :**`r`nNo Changes ! :thumbsup:`r`n`r`nThis comment thread is closed as there are no changes !"; commentType = "text" }
+          $request.status = "closed"
+      }
+      else {
+          $comment = @{ content = "**Terraform Plan changes summary :**`r`n"; commentType = "codeChange" }
+          foreach ($change in $changes) {
+              $actions = $change.change.actions | ForEach-Object { ToIcon($_) }
+              $nameBefore = $change.change.before.name
+              $nameAfter = $change.change.after.name
+
+              if($nameBefore -and $nameAfter -and ($nameBefore -ne $nameAfter)) {
+                  $resource = "$nameBefore :arrow_right: $nameAfter"
+              } elseif ($nameBefore -and $nameAfter) {
+                  $resource = $nameBefore
+              } elseif ($nameBefore -and (-not $nameAfter)) {
+                  $resource = $nameBefore
+              } elseif ($nameAfter -and (-not $nameBefore)) {
+                  $resource = $nameAfter
+              }
+
+              $comment.content += "$([System.String]::Join(" ", $actions)) $resource ($($change.type))`r`n"
+          }
+          $comment.content += "`r`nThis comment thread is active, don't forget to mark it as resolved or won't fix !"
+      }
+
+      $linkUrl = [System.Uri]::EscapeUriString("${env:System_TeamFoundationCollectionUri}${env:System_TeamProject}/_build/results?buildId=${env:BUILD_BUILDID}&view=logs&j=${env:SYSTEM_JOBID}")
+      $comment.content += "`r`nSee [Pipeline ${env:BUILD_BUILDNUMBER} logs]($linkUrl)"
+
+      $request.comments.Add($comment) | Out-Null
+      $url = "${env:System_TeamFoundationCollectionUri}${env:System_TeamProject}/_apis/git/repositories/${env:Build_Repository_ID}/pullRequests/${env:system_pullRequest_pullRequestId}/threads?api-version=5.1"
+      Invoke-RestMethod -Method "POST" -Uri $url -Body ($request | ConvertTo-Json) -ContentType "application/json" -Headers @{ Authorization = "Bearer ${env:SYSTEM_ACCESSTOKEN}" }
+    pwsh: true
+    workingDirectory: pwsh
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)

@@ -1,0 +1,22 @@
+pool:
+  name: Azure Pipelines
+variables:
+- group: Terraform-Variable-Group
+- name: system.debug
+  value: false
+steps:
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+  displayName: Install Terraform 0.14.6
+  inputs:
+    terraformVersion: 0.14.6
+- task: CmdLine@2
+  displayName: Terraform Init
+  inputs:
+    script: terraform init -backend-config="access_key=$(jtmsneusacesterraform001-key1)"
+    workingDirectory: terraform
+- task: CmdLine@2
+  displayName: Terraform Import
+  inputs:
+    script: |
+      terraform import -input=false -var="spn-client-id=$(nstar-tenant-tf-spn-client-id)" -var="spn-client-secret=$(nstar-tenant-tf-spn-secret)" -var="spn-tenant-id=$(nstar-tenant-tf-spn-tenant-id)" azurerm_role_definition.network-readers-vwan-routes "/providers/Microsoft.Authorization/roleDefinitions/e661db04-4e55-3142-89f4-d3e273090ca2|/providers/Microsoft.Management/managementGroups/JT"
+    workingDirectory: terraform

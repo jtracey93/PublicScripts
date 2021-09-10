@@ -1,0 +1,45 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - terraform/
+pool:
+  name: Azure Pipelines
+variables:
+- group: Terraform-Variable-Group
+- name: system.debug
+  value: false
+steps:
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+  displayName: Install Terraform 0.14.6
+  inputs:
+    terraformVersion: 0.14.6
+- task: CmdLine@2
+  displayName: Terraform Init
+  inputs:
+    script: terraform init -backend-config="access_key=$(jtmsneusacesterraform001-key1)"
+    workingDirectory: terraform
+- task: CmdLine@2
+  displayName: Terraform Validate
+  inputs:
+    script: terraform validate
+    workingDirectory: terraform
+- task: CmdLine@2
+  displayName: Terraform Plan
+  inputs:
+    script: terraform plan -input=false -out=tfplan -var="spn-client-id=$(nstar-tenant-tf-spn-client-id)" -var="spn-client-secret=$(nstar-tenant-tf-spn-secret)" -var="spn-tenant-id=$(nstar-tenant-tf-spn-tenant-id)"
+    workingDirectory: terraform
+- task: ArchiveFiles@2
+  displayName: Archive Terraform Plan Files
+  inputs:
+    rootFolderOrFile: terraform
+    archiveType: tar
+    sevenZipCompression: 5
+    archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-tfplan.tgz
+- task: PublishPipelineArtifact@1
+  displayName: Publish Terraform Plan Artifact
+  inputs:
+    targetPath: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-tfplan.tgz
+    artifact: $(Build.BuildId)-tfplan

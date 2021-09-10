@@ -1,0 +1,23 @@
+variables:
+- group: Terraform-Variable-Group
+steps:
+- task: ExtractFiles@1
+  displayName: 'Extract files '
+  inputs:
+    archiveFilePatterns: $(System.ArtifactsDirectory)/_Terraform Plan/$(Build.BuildId)-tfplan/$(Build.BuildId)-tfplan.tgz
+    destinationFolder: $(System.DefaultWorkingDirectory)/
+    cleanDestinationFolder: false
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+  displayName: Install Terraform 0.14.6
+  inputs:
+    terraformVersion: 0.14.6
+- task: CmdLine@2
+  displayName: Terraform Init
+  inputs:
+    script: terraform init -backend-config="access_key=$(jtmsneusacesterraform001-key1)"
+    workingDirectory: $(System.DefaultWorkingDirectory)/terraform/
+- task: CmdLine@2
+  displayName: Terraform Apply
+  inputs:
+    script: terraform apply -auto-approve -input=false tfplan
+    workingDirectory: $(System.DefaultWorkingDirectory)/terraform/
