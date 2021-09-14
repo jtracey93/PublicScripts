@@ -80,7 +80,7 @@ ForEach ($subscription in $intermediateRootGroupChildSubscriptions) {
 
     $resources | ForEach-Object -Parallel {
         Write-Host "Deleting " $_.ResourceGroupName "..." -ForegroundColor Red
-        Remove-AzResourceGroup -Name $_.ResourceGroupName -Force
+        Remove-AzResourceGroup -Name $_.ResourceGroupName -Force | Out-Null
     }
     
     # Get Deployments for Subscription
@@ -90,11 +90,10 @@ ForEach ($subscription in $intermediateRootGroupChildSubscriptions) {
     
     # For each Subscription level deployment, remove it
     $subDeployments | ForEach-Object -Parallel {
-        Write-Host "Removing $_.DeploymentName ..." -ForegroundColor Red
+        Write-Host "Removing $($_.DeploymentName) ..." -ForegroundColor Red
         Remove-AzSubscriptionDeployment -Id $_.Id
     }
 }
-
 
 # Get all AAD Tenant level deployments
 $tenantDeployments = Get-AzTenantDeployment
@@ -107,7 +106,7 @@ $tenantDeployments | ForEach-Object -Parallel {
     Remove-AzTenantDeployment -Id $_.Id
 }
 
-# Remove 
+# Remove ESLZ SPN, if provided
 if ($eslzAADSPNName -ne "") {
     Write-Host "Removing Azure AD Application Registration/SPN:" $eslzAADSPNName -ForegroundColor Red
     Remove-AzADApplication -DisplayName $eslzAADSPNName -Force
@@ -115,7 +114,6 @@ if ($eslzAADSPNName -ne "") {
 else {
     Write-Host "No Azure AD Application/SPN was provided. Therefore no Azure AD Application/SPN will be removed." -ForegroundColor Cyan
 }
-
 
 # This function only deletes Management Groups in the Intermediate Root Management Group's hierarchy tree and will NOT delete other Intermediate Root level Management Groups and their children e.g. in the case of "canary"
 function Remove-Recursively($name) {
