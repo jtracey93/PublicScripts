@@ -4,7 +4,7 @@
 # Version: 1.0
 # Last Modified: 14/09/2021
 # Author: Jack Tracey 
-# Contributors: Liam F. O'Neil, Paul Grimley
+# Contributors: Liam F. O'Neill, Paul Grimley
 
 <#
 .SYNOPSIS
