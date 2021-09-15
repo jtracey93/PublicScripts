@@ -106,7 +106,7 @@ Write-Host "Removing all Tenant level deployments" -ForegroundColor Yellow
 
 # For each AAD Tenant level deployment, remove it
 $tenantDeployments | ForEach-Object -Parallel {
-    Write-Host "Removing $_.DeploymentName ..." -ForegroundColor Red
+    Write-Host "Removing $($_.DeploymentName) ..." -ForegroundColor Red
     Remove-AzTenantDeployment -Id $_.Id
 }
 
