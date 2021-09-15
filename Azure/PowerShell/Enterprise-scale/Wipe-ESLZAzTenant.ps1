@@ -22,13 +22,17 @@ Fully resets an AAD tenant after deploying Enterprise Scale (Azure Landing Zone 
 
 .NOTES
 Learn more about Enterprise-scale here:
-https://github.com/azure/Enterprise-Scale
+https://github.com/Azure/Enterprise-Scale
 https://aka.ms/es/guides
 
+# Required PowerShell Modules:
+- https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-6.4.0
+
 # Release notes 14/09/2021: 
-Initial release.
-GroupName has been changes to GroupId as per Az PowerShell module warning message 'upcoming breaking changes in the cmdlet 'Get-AzManagementGroup'as documented https://aka.ms/azps-changewarnings'
-Warnings have been disabled!
+- Initial release.
+- GroupName has been changes to GroupId as per Az PowerShell module warning message 'upcoming breaking changes in the cmdlet 'Get-AzManagementGroup'as documented https://aka.ms/azps-changewarnings'
+    - Warnings have been disabled!
+- Uses Azure Resource Graph to get list of subscriptions in the Intermediate Root Management Group's hierarchy tree, therefore it can take a few minutes (5/10) for the Resoruce Graph data to refresh and pull all the Subscriptions in the tree, if recently moved between Management Groups 
 #>
 
 [CmdletBinding()]
@@ -124,8 +128,8 @@ function Remove-Recursively($name) {
     # Checks if there is any parent level
     if ($null -ne $parent.Children) {
         Write-Host "Found the following Children :" -ForegroundColor Yellow
-
         Write-host ($parent.Children | Select-Object Name).Name -ForegroundColor White
+
         foreach ($children in $parent.Children) {
             # Tries to recur to each child item
             Remove-Recursively($children.Name)
