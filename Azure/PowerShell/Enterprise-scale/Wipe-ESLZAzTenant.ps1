@@ -1,10 +1,10 @@
 ######################
 # Wipe-ESLZAzTenant #
 ######################
-# Version: 1.0
-# Last Modified: 14/09/2021
+# Version: 1.1
+# Last Modified: 29/09/2021
 # Author: Jack Tracey 
-# Contributors: Liam F. O'Neill, Paul Grimley
+# Contributors: Liam F. O'Neill, Paul Grimley, Jeff Mitchell
 
 <#
 .SYNOPSIS
@@ -27,6 +27,8 @@ https://aka.ms/es/guides
 
 # Required PowerShell Modules:
 - https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-6.4.0
+- Install-Module -Name Az 
+- Specifically 'Az.Accounts', 'Az.Resources' & 'Az.ResourceGraph' if you need to limit what is installed
 
 # Release notes 14/09/2021: 
 - Initial release.
@@ -57,6 +59,13 @@ Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
 # Start timer
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch
 $StopWatch.Start()
+
+# Check required PowerShell modules are installed
+if ((Get-InstalledModule -Name 'Az' -MinimumVersion '6.3.0' -ErrorAction SilentlyContinue) -or ((Get-InstalledModule -Name 'Az.Accounts' -MinimumVersion '2.5.2' -ErrorAction SilentlyContinue) -and (Get-InstalledModule -Name 'Az.Resources' -MinimumVersion '4.3.0' -ErrorAction SilentlyContinue) -and (Get-InstalledModule -Name 'Az.ResourceGraph' -MinimumVersion '0.7.7' -ErrorAction SilentlyContinue))) {
+    Write-Host "Required Az Powershell Modules are installed" -ForegroundColor Green 
+} else {
+    throw "Required Az Powershell Modules are installed. Required modules are: 'Az' OR 'Az.Accounts' (v2.5.2+), 'Az.Resources' (v4.3.0+) & 'Az.ResourceGraph' (v0.7.7+)"
+}
 
 # Get all Subscriptions that are in the Intermediate Root Management Group's hierarchy tree
 $intermediateRootGroupChildSubscriptions = Search-AzGraph -Query "resourcecontainers | where type =~ 'microsoft.resources/subscriptions' | mv-expand mgmtGroups=properties.managementGroupAncestorsChain | where mgmtGroups.name =~ '$intermediateRootGroupID' | project subName=name, subID=subscriptionId, subState=properties.state, aadTenantID=tenantId, mgID=mgmtGroups.name, mgDisplayName=mgmtGroups.displayName"
