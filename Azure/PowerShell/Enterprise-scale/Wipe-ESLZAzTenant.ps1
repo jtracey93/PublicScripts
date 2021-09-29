@@ -30,11 +30,14 @@ https://aka.ms/es/guides
 - Install-Module -Name Az 
 - Specifically 'Az.Accounts', 'Az.Resources' & 'Az.ResourceGraph' if you need to limit what is installed
 
-# Release notes 14/09/2021: 
+# Release notes 14/09/2021 - V1.0: 
 - Initial release.
 - GroupName has been changes to GroupId as per Az PowerShell module warning message 'upcoming breaking changes in the cmdlet 'Get-AzManagementGroup'as documented https://aka.ms/azps-changewarnings'
     - Warnings have been disabled!
 - Uses Azure Resource Graph to get list of subscriptions in the Intermediate Root Management Group's hierarchy tree, therefore it can take a few minutes (5/10) for the Resoruce Graph data to refresh and pull all the Subscriptions in the tree, if recently moved between Management Groups 
+
+# Release notes 29/09/2021 - V1.1:
+- Added checks and break, if not installed, for required Azure PowerShell modules: 'Az' or 'Az.Accounts', 'Az.Resources' & 'Az.ResourceGraph'
 #>
 
 [CmdletBinding()]
