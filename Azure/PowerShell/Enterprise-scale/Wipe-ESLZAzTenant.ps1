@@ -1,10 +1,10 @@
 ######################
 # Wipe-ESLZAzTenant #
 ######################
-# Version: 1.2
-# Last Modified: 30/09/2021
+# Version: 1.3
+# Last Modified: 01/10/2021
 # Author: Jack Tracey 
-# Contributors: Liam F. O'Neill, Paul Grimley, Jeff Mitchell
+# Contributors: Liam F. O'Neill, Paul Grimley, Jeff Mitchell, Johan Dahlbom
 
 <#
 .SYNOPSIS
@@ -42,9 +42,17 @@ https://aka.ms/es/guides
 # Release notes 30/09/2021 - V1.2:
 - Added checks to ensure this is running on PowerShell Core edition and not Desktop - https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.1
 - Added user confirmation prompt with random 8 character code they must enter to confirm before anything is removed/moved by the script
+
+# Release notes 01/10/2021 - V1.3:
+- Changed the way checks are handled for required PowerShell modules
 #>
 
+# Check for pre-reqs
 #Requires -PSEdition Core
+#Requires -Modules @{ ModuleName="Az.Accounts"; ModuleVersion="2.5.2" }
+#Requires -Modules @{ ModuleName="Az.Resources"; ModuleVersion="4.3.0" }
+#Requires -Modules @{ ModuleName="Az.ResourceGraph"; ModuleVersion="0.7.7" }
+
 
 [CmdletBinding()]
 param (
@@ -69,15 +77,6 @@ Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch
 $StopWatch.Start()
 
-# Check required PowerShell modules are installed
-if ((Get-InstalledModule -Name 'Az' -MinimumVersion '6.3.0' -ErrorAction SilentlyContinue) -or ((Get-InstalledModule -Name 'Az.Accounts' -MinimumVersion '2.5.2' -ErrorAction SilentlyContinue) -and (Get-InstalledModule -Name 'Az.Resources' -MinimumVersion '4.3.0' -ErrorAction SilentlyContinue) -and (Get-InstalledModule -Name 'Az.ResourceGraph' -MinimumVersion '0.7.7' -ErrorAction SilentlyContinue))) {
-    Write-Host "Required Az Powershell Modules are installed" -ForegroundColor Green
-    Write-Host ""
-}
-else {
-    throw "Required Az Powershell Modules are installed. Required modules are: 'Az' OR 'Az.Accounts' (v2.5.2+), 'Az.Resources' (v4.3.0+) & 'Az.ResourceGraph' (v0.7.7+)"
-}
-
 # Get all Subscriptions that are in the Intermediate Root Management Group's hierarchy tree
 $intermediateRootGroupChildSubscriptions = Search-AzGraph -Query "resourcecontainers | where type =~ 'microsoft.resources/subscriptions' | mv-expand mgmtGroups=properties.managementGroupAncestorsChain | where mgmtGroups.name =~ '$intermediateRootGroupID' | project subName=name, subID=subscriptionId, subState=properties.state, aadTenantID=tenantId, mgID=mgmtGroups.name, mgDisplayName=mgmtGroups.displayName"
 
@@ -94,6 +93,7 @@ if ($null -ne $intermediateRootGroupChildSubscriptions) {
     $userConfirmationSubsToMove
 } else {
     Write-Host "No Subscriptions found in selected/entered hierarchy"
+    Write-Host ""
 }
 
 # Generate 8 character random string (combination of lowercase letters and integers)
