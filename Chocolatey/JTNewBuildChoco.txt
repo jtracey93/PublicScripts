@@ -29,10 +29,13 @@ choco install zoomit -y
 choco install tree -y
 choco install gh -y
 choco install dropbox -y
-choco install advanced-ip-scanner -y
+choco install cascadiafonts -y
+choco install cascadia-code-nerd-font -y
+
+# Optional
 choco install camtasia -y
 choco install snagit -y
-choco install cascadiafonts -y
+
 
 # Git Config Setup
 git config --global user.name "Jack Tracey"
