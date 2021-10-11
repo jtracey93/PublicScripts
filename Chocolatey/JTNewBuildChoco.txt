@@ -29,8 +29,10 @@ choco install zoomit -y
 choco install tree -y
 choco install gh -y
 choco install dropbox -y
+choco install screentogif -y
 choco install cascadiafonts -y
 choco install cascadia-code-nerd-font -y
+
 
 # Optional
 choco install camtasia -y
