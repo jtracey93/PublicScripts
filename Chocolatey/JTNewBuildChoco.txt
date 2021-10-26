@@ -60,5 +60,5 @@ Install-Module -Name Terminal-Icons -Repository PSGallery
 code $PROFILE
 #Import-Module posh-git
 #Import-Module oh-my-posh
-#Set-PoshPrompt -Theme Paradox
+#Set-PoshPrompt -Theme jtracey93
 #Import-Module -Name Terminal-Icons
