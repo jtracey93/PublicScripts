@@ -1,0 +1,58 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/" xmlns:googleplay="http://www.google.com/schemas/play-podcasts/1.0" version="2.0">
+<channel>
+<title>Sussex Azure User Group - Podcast</title>
+<atom:link href="http://localhost:1313/episode/index.xml" rel="self" type="application/rss+xml"/>
+<link>http://localhost:1313/</link>
+<description>The Sussex Azure User Group Podcast was born at the start of the COVID-19 pandemic by Jack Tracey and Ryan Littlemore, how previously ran the user group in person events in Brighton, UK. The podcast was started to continue to discuss, present and chat about all things Azure, mainly infrastructure related, with special guests and much more.</description>
+<lastBuildDate>Wed, 27 May 2020 19:00:00 +0000</lastBuildDate>
+<sy:updatePeriod>hourly</sy:updatePeriod>
+<sy:updateFrequency>1</sy:updateFrequency>
+<language>en-gb</language>
+<copyright>Copyright 2021 - Sussex Azure User Group</copyright>
+<itunes:author>Sussex Azure User Group</itunes:author>
+<itunes:type>episodic</itunes:type>
+<googleplay:author>Sussex Azure User Group</googleplay:author>
+<googleplay:email>podcast@sussexazure.uk</googleplay:email>
+<itunes:summary>The Sussex Azure User Group Podcast was born at the start of the COVID-19 pandemic by Jack Tracey and Ryan Littlemore, how previously ran the user group in person events in Brighton, UK. The podcast was started to continue to discuss, present and chat about all things Azure, mainly infrastructure related, with special guests and much more.</itunes:summary>
+<googleplay:description>The Sussex Azure User Group Podcast was born at the start of the COVID-19 pandemic by Jack Tracey and Ryan Littlemore, how previously ran the user group in person events in Brighton, UK. The podcast was started to continue to discuss, present and chat about all things Azure, mainly infrastructure related, with special guests and much more.</googleplay:description>
+<itunes:owner>
+<itunes:name>Jack Tracey</itunes:name>
+<itunes:email>podcast@sussexazure.uk</itunes:email>
+</itunes:owner>
+<itunes:image href="https://podcast.sussexazure.uk/img/saug-podcast-artwork.png"/>
+<googleplay:image href="https://podcast.sussexazure.uk/img/saug-podcast-artwork.png"/>
+<image>
+<url>https://podcast.sussexazure.uk/img/saug-podcast-artwork.png</url>
+<title>Sussex Azure User Group - Podcast</title>
+<link>http://localhost:1313/</link>
+</image>
+<itunes:category text="Technology"> </itunes:category>
+<generator>Hugo -- gohugo.io</generator>
+<item>
+<title>Episode 1: Build 2020 Recap</title>
+<link>http://localhost:1313/1/</link>
+<pubDate>Wed, 27 May 2020 19:00:00 +0000 </pubDate>
+<dc:creator/>
+<guid>https://saugweusac001.blob.core.windows.net/podcasts/SAUGPodcastEpisode1.mp3</guid>
+<itunes:author> Jack Tracey and Ryan Littlemore</itunes:author>
+<itunes:episode>1</itunes:episode>
+<itunes:title>Episode 1: Build 2020 Recap</itunes:title>
+<itunes:subtitle>
+<![CDATA[ ]]>
+</itunes:subtitle>
+<itunes:summary/>
+<description/>
+<googleplay:description/>
+<content:encoded>
+<![CDATA[ <p><em><strong>This podcast, its content and all things relating to the Sussex Azure User Group are NOT affiliated with Microsoft or any of its partners! All thoughts, views, opinions are of the talkers own minds!</strong></em></p> <p>Welcome to our first episode of our newly created podcast!</p> <p>This week Jack and Ryan are joined by Margaret Orton (Azure Application Development Specialist @ Microsoft) to discuss all the recent announcements from Microsoft Build 2020; the first ever virtual edition of this conference!</p> <p>As always further information about the Sussex Azure User Group can be found on our website. We also welcome you to follow us on Twitter, LinkedIn &amp; subscribe to our YouTube channel; all links in the footer!</p> <h2 id="links-shared-from-the-episode">Links Shared from the Episode</h2> <ul> <li><a href="https://news.microsoft.com/build-2020-book-of-news/">Microsoft Build 2020 Book Of News</a></li> <li><a href="https://mybuild.microsoft.com/">Microsoft Build 2020 Recorded Sessions</a></li> <li><a href="https://www.youtube.com/watch?v=S_wNRx7f7rU">Satya Nadella&rsquo;s Opening Remarks @ Build 2020</a></li> <li><a href="https://www.youtube.com/watch?v=UaVCNpD3pvg">ARM Template Updates Session @ Build 2020 With Alex Frankel</a></li> <li><a href="https://www.youtube.com/watch?v=nPWZRhPDICM">Azure Synapse Link Overview</a></li> <li><a href="https://devblogs.microsoft.com/commandline/windows-terminal-1-0/">Windows Terminal V1.0 Released</a></li> <li><a href="https://devblogs.microsoft.com/commandline/windows-package-manager-preview/">Windows Package Manager Preview Announced - WinGet</a></li> <li><a href="https://github.com/microsoft/PowerToys">PowerToys V0.18 Released</a></li> <li><a href="https://kirkryan.co.uk/2020/05/19/announcing-anf-snapshot-scheduler-v2/">ANF Snapshot Scheduler V2 Released By Kirk Ryan</a></li> </ul> ]]>
+</content:encoded>
+<itunes:image href="http://localhost:1313/img/saug-podcast-artwork-ep1-thumb.png"/>
+<googleplay:image href="http://localhost:1313/img/saug-podcast-artwork-ep1-thumb.png"/>
+<enclosure url="https://saugweusac001.blob.core.windows.net/podcasts/SAUGPodcastEpisode1.mp3" length="560822173" type="audio/mpeg"/>
+<itunes:duration>3928</itunes:duration>
+<itunes:explicit>false</itunes:explicit>
+<googleplay:explicit>no</googleplay:explicit>
+</item>
+</channel>
+</rss>
