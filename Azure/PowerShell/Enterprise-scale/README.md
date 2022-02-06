@@ -85,7 +85,7 @@ To use this script you will need to create a new `.ps1` file locally on your mac
 # Version: 1.3
 # Last Modified: 01/10/2021
 # Author: Jack Tracey 
-# Contributors: Liam F. O'Neill, Paul Grimley, Jeff Mitchell, Johan Dahlbom
+# Contributors: Liam F. O'Neill, Paul Grimley, Jeff Mitchell
 
 <#
 .SYNOPSIS
