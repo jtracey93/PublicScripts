@@ -63,3 +63,6 @@ code $PROFILE
 #Import-Module oh-my-posh
 #Set-PoshPrompt -Theme jtracey93
 #Import-Module -Name Terminal-Icons
+
+#New-Alias wipealz C:\GitRepos\GitHub-jtracey93\PublicScripts\Azure\PowerShell\Enterprise-scale\Wipe-ESLZAzTenant.ps1 -Scope Global -Option AllScope
+#New-Alias tf terraform.exe -Scope Global -Option AllScope
