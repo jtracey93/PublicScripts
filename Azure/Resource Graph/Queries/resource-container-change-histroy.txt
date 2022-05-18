@@ -1,0 +1,7 @@
+resourcecontainerchanges 
+| extend timeHappened = todatetime(properties.changeAttributes.timestamp)
+| extend resType = tostring(properties.targetResourceType)
+| extend changeType = tostring(properties.changeType)
+| extend resId = tostring(properties.targetResourceId)
+| extend changesDetail = parse_json(properties.changes)
+| project timeHappened, resType, resId, changeType, changesDetail
