@@ -57,6 +57,7 @@ Install-Module posh-git -Scope CurrentUser
 Install-Module oh-my-posh -Scope CurrentUser
 Install-Module -Name PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
 Install-Module -Name Terminal-Icons -Repository PSGallery
+Install-Module -Name PSReadLine -AllowPrerelease -Force
 
 # Terminal Config
 code $PROFILE
@@ -64,6 +65,8 @@ code $PROFILE
 #Import-Module oh-my-posh
 #Set-PoshPrompt -Theme jtracey93
 #Import-Module -Name Terminal-Icons
+
+#Import-Module PSReadLine
 
 #New-Alias wipealz C:\GitRepos\GitHub-jtracey93\PublicScripts\Azure\PowerShell\Enterprise-scale\Wipe-ESLZAzTenant.ps1 -Scope Global -Option AllScope
 #New-Alias tf terraform.exe -Scope Global -Option AllScope
