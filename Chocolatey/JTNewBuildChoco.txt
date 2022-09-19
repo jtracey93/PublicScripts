@@ -39,6 +39,7 @@ choc install gsudo -y
 choco install cascadiafonts -y
 choco install cascadia-code-nerd-font -y
 choco install gnupg -y
+choco install keepass -y
 
 # Optional
 choco install camtasia -y
@@ -48,6 +49,8 @@ choco install snagit -y
 git config --global user.name "Jack Tracey"
 git config --global user.email "jack@jacktracey.co.uk"
 git config --global core.editor "code --wait"
+
+## Setup GPG for Git
 
 # WSL 
 wsl --install
