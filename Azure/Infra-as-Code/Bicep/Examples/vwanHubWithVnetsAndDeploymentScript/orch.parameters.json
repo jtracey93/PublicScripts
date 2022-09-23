@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "region": {
+      "value": "uksouth"
+    },
+    "regionNamePrefix": {
+      "value": "uks"
+    },
+    "deployVPNGateway": {
+      "value": false
+    },
+    "vwanHubCIDR": {
+      "value": "10.0.0.0/23"
+    }
+  }
+}
