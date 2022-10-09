@@ -7,7 +7,7 @@ param (
   $apiVersion = "2022-01-01",
 
   [string]
-  $azResourcePropertyPathToCheck,
+  $azResourcePropertyToCheck = "provisioningState",
 
   [string]
   $azResourceDesiredState = "Provisioned",
@@ -19,7 +19,7 @@ param (
   $maxIterations = 30
 )
 
-$totalTimeoutCalculation = $waitInSecondsBetweenIterations * $maxIterations / 60
+$totalTimeoutCalculation = $waitInSecondsBetweenIterations * $maxIterations + $waitInSecondsBetweenIterations
 
 $azResourcePropertyExistenceCheck = Invoke-AzRestMethod -Method GET -Path "$($azResourceResourceId)?api-version=$($apiVersion)"
 
@@ -34,7 +34,7 @@ $iterationCount = 0
 do {
   $azResourcePropertyStateGet = Invoke-AzRestMethod -Method GET -Path "$($azResourceResourceId)?api-version=$($apiVersion)"
   $azResourcePropertyStateJsonConverted = $azResourcePropertyStateGet.Content | ConvertFrom-Json -Depth 10
-  $azResourcePropertyStateResult = $azResourcePropertyStateJsonConverted.$($azResourcePropertyPathToCheck)
+  $azResourcePropertyStateResult = $azResourcePropertyStateJsonConverted.properties.$($azResourcePropertyToCheck)
 
   if ($azResourcePropertyStateResult -ne $azResourceDesiredState) {
     Write-Host "Azure Resource Property is not in $($azResourceDesiredState) state. Waiting $($waitInSecondsBetweenIterations) seconds before checking again. Iteration count: $($iterationCount)"
@@ -51,6 +51,6 @@ if ($azResourcePropertyStateResult -eq $azResourceDesiredState) {
 }
 
 if ($iterationCount -eq $maxIterations -and $azResourcePropertyStateResult -ne $azResourceDesiredState) {
-  $DeploymentScriptOutputs["azResourcePropertyState"] = "Still not in desired state of $($azResourceDesiredState). Timeout reached of $($totalTimeoutCalculation) minutes."
-  throw "Azure Resource Property is still not in $($azResourceDesiredState) state after $($totalTimeoutCalculation) minutes"
+  $DeploymentScriptOutputs["azResourcePropertyState"] = "Still not in desired state of $($azResourceDesiredState). Timeout reached of $($totalTimeoutCalculation) seconds."
+  throw "Azure Resource Property is still not in $($azResourceDesiredState) state after $($totalTimeoutCalculation) seconds."
 }
