@@ -4,7 +4,7 @@ param (
   $azResourceResourceId,
 
   [string]
-  $apiVersion = "2022-01-01",
+  $apiVersion = "2022-05-01",
 
   [string]
   $azResourcePropertyToCheck = "provisioningState",
