@@ -73,7 +73,7 @@ param (
     [string]
     $eslzAADSPNName = "",
 
-    [Parameter(Mandatory = $true, Position = 4, HelpMessage = "Do you want to reset the MDFC tiers to Free on each of the Subscriptions in scope?")]
+    [Parameter(Mandatory = $false, Position = 4, HelpMessage = "Do you want to reset the MDFC tiers to Free on each of the Subscriptions in scope?")]
     [bool]
     $resetMdfcTierOnSubs = $true
 )
@@ -168,12 +168,13 @@ ForEach ($subscription in $intermediateRootGroupChildSubscriptions) {
         Write-Host "Resetting MDFC tier to Free for Subscription: $($subscription.subName)" -ForegroundColor Yellow
         
         $currentMdfcForSubUnfiltered = Get-AzSecurityPricing
-        $currentMdfcForSub = $currentMdfcForSubUnfiltered | Where-Object { $_.Name -ne "CloudPosture" }
+        $currentMdfcForSubFilterOffering = $currentMdfcForSubUnfiltered | Where-Object { $_.Name -ne "CloudPosture" }
+        $currentMdfcForSub = $currentMdfcForSubFilterOffering | Where-Object { $_.PricingTier -ne "Free" }
 
         ForEach ($mdfcPricingTier in $currentMdfcForSub) {
             Write-Host "Resetting $($mdfcPricingTier.Name) to Free MDFC Pricing Tier for Subscription: $($subscription.subName)" -ForegroundColor Yellow
             
-            Set-AzSecurityPricing -Name $mdfcPricingTier.Name -Tier 'Free'
+            Set-AzSecurityPricing -Name $mdfcPricingTier.Name -PricingTier 'Free'
         }
     }
 }

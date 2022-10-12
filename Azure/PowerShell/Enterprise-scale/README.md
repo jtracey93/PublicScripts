@@ -43,12 +43,12 @@ This PowerShell script will check for each of the below before allowing it to ru
 
 ## Input Parameters for `Wipe-ESLZAzTenant.ps1` PowerShell Script
 
-|     Parameter Name      |                                                                              Description                                                                               |   Required    |             Example Input              |
-| :---------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------: | :------------------------------------: |
-|    tenantRootGroupID    |    This is the Azure AD Tenant ID, which is also the Name/ID for the Tenant Root Management Group (this is set by the platform when Management Groups are enabled)     |      Yes      | "f73a2b89-6c0e-4382-899f-ea227cd6b68f" |
-| intermediateRootGroupID |                                  This is the Name/ID of the Management Group you want to remove everything beneath, including itself.                                  |      Yes      |               "Contoso"                |
-|     eslzAADSPNName      |                             This is the Name of the Azure AD Service Principal (SPN) that you may use for your Enterprise-scale deployment                             | No - Optional |           "Contoso-ESLZ-SPN"           |
-|   resetMdfcTierOnSubs   | This parameter, if set to true, will set the Microsoft Defender for Cloud (MDFC) pricing tiers for all offerings to 'Free' (apart from 'CloudPosture' - a.k.a. 'CPSM') | No - Optional |                "$true"                 |
+|     Parameter Name      |                                                                                             Description                                                                                             |   Required    |             Example Input              | Default Value |
+| :---------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------: | :------------------------------------: | :-----------: |
+|    tenantRootGroupID    |                   This is the Azure AD Tenant ID, which is also the Name/ID for the Tenant Root Management Group (this is set by the platform when Management Groups are enabled)                   |      Yes      | "f73a2b89-6c0e-4382-899f-ea227cd6b68f" |      N/A      |
+| intermediateRootGroupID |                                                This is the Name/ID of the Management Group you want to remove everything beneath, including itself.                                                 |      Yes      |               "Contoso"                |      N/A      |
+|     eslzAADSPNName      |                                           This is the Name of the Azure AD Service Principal (SPN) that you may use for your Enterprise-scale deployment                                            | No - Optional |           "Contoso-ESLZ-SPN"           |     `""`      |
+|   resetMdfcTierOnSubs   | This parameter, if set to true, will set the Microsoft Defender for Cloud (MDFC) pricing tiers for all offerings to 'Free' (apart from 'CloudPosture' - a.k.a. 'CPSM'). This is enabled by default. | No - Optional |                "$false"                 |    `$true`    |
 
 ## Example usage of `Wipe-ESLZAzTenant.ps1` PowerShell Script
 
@@ -57,13 +57,19 @@ This PowerShell script will check for each of the below before allowing it to ru
 3. Change to the correct Tenant/Account context with `Get-AzContext` to list all available contexts and `Select-AzContext` to select the desired one.
 4. Run the script using either of the examples below
 
-### Without SPN removal:
+### Without SPN removal & Resetting MDFC Tiers Set To Free:
 
 ```powershell
 .\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso"
 ```
 
-### Without MDFC Tiers Set To Free:
+Or
+
+```powershell
+.\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso" -resetMdfcTierOnSubs:$true
+```
+
+### Without Resetting MDFC Tiers Set To Free:
 
 ```powershell
 .\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso" -resetMdfcTierOnSubs:$false
