@@ -1,8 +1,8 @@
 ######################
 # Wipe-ESLZAzTenant #
 ######################
-# Version: 1.3
-# Last Modified: 01/10/2021
+# Version: 1.4
+# Last Modified: 12/10/2022
 # Author: Jack Tracey 
 # Contributors: Liam F. O'Neill, Paul Grimley, Jeff Mitchell
 
@@ -15,10 +15,10 @@ Fully resets an AAD tenant after deploying Enterprise Scale (Azure Landing Zone 
 
 .EXAMPLE
 # Without SPN Removal
-.\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso"
+.\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso" -resetMdfcTierOnSubs:$true
 
 # With SPN Removal
-.\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso" -eslzAADSPNName = "Contoso-ESLZ-SPN"
+.\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso" -eslzAADSPNName = "Contoso-ESLZ-SPN" -resetMdfcTierOnSubs:$true
 
 .NOTES
 Learn more about Enterprise-scale here:
@@ -45,6 +45,9 @@ https://aka.ms/es/guides
 
 # Release notes 01/10/2021 - V1.3:
 - Changed the way checks are handled for required PowerShell modules
+
+# Release notes 12/10/2022 - V1.4:
+- Added reset to MDFC tiers on each of the Subscriptions
 #>
 
 # Check for pre-reqs
@@ -52,6 +55,7 @@ https://aka.ms/es/guides
 #Requires -Modules @{ ModuleName="Az.Accounts"; ModuleVersion="2.5.2" }
 #Requires -Modules @{ ModuleName="Az.Resources"; ModuleVersion="4.3.0" }
 #Requires -Modules @{ ModuleName="Az.ResourceGraph"; ModuleVersion="0.7.7" }
+#Requires -Modules @{ ModuleName="Az.Security"; ModuleVersion="1.3.0" }
 
 
 [CmdletBinding()]
@@ -67,7 +71,11 @@ param (
 
     [Parameter(Mandatory = $false, Position = 3, HelpMessage = "(Optional) Please enter the display name of your Enterprise-scale app registration in Azure AD. If left blank, no app registration is deleted.")]
     [string]
-    $eslzAADSPNName = ""
+    $eslzAADSPNName = "",
+
+    [Parameter(Mandatory = $true, Position = 4, HelpMessage = "Do you want to reset the MDFC tiers to Free on each of the Subscriptions in scope?")]
+    [bool]
+    $resetMdfcTierOnSubs = $true
 )
 
 #Toggle to stop warnings with regards to DisplayName and DisplayId
@@ -91,7 +99,8 @@ Write-Host "The above Management Group hierarchy contains the following Subscrip
 Write-Host ""
 if ($null -ne $intermediateRootGroupChildSubscriptions) {
     $userConfirmationSubsToMove
-} else {
+}
+else {
     Write-Host "No Subscriptions found in selected/entered hierarchy"
     Write-Host ""
 }
@@ -125,7 +134,7 @@ $intermediateRootGroupChildSubscriptions | ForEach-Object -Parallel {
     if ($_.subState -ne "Disabled") {
         Write-Host "Moving Subscription: '$($_.subName)' under Tenant Root Management Group: '$($using:tenantRootGroupID)'" -ForegroundColor Cyan
         New-AzManagementGroupSubscription -GroupId $using:tenantRootGroupID -SubscriptionId $_.subID
-    }    
+    }
 }
 
 # For each Subscription in the Intermediate Root Management Group's hierarchy tree, remove all Resources, Resource Groups and Deployments
@@ -152,6 +161,20 @@ ForEach ($subscription in $intermediateRootGroupChildSubscriptions) {
     $subDeployments | ForEach-Object -Parallel {
         Write-Host "Removing $($_.DeploymentName) ..." -ForegroundColor Red
         Remove-AzSubscriptionDeployment -Id $_.Id
+    }
+
+    # Set MDFC tier to Free for each Subscription
+    if ($resetMdfcTierOnSubs) {
+        Write-Host "Resetting MDFC tier to Free for Subscription: $($subscription.subName)" -ForegroundColor Yellow
+        
+        $currentMdfcForSubUnfiltered = Get-AzSecurityPricing
+        $currentMdfcForSub = $currentMdfcForSubUnfiltered | Where-Object { $_.Name -ne "CloudPosture" }
+
+        ForEach ($mdfcPricingTier in $currentMdfcForSub) {
+            Write-Host "Resetting $($mdfcPricingTier.Name) to Free MDFC Pricing Tier for Subscription: $($subscription.subName)" -ForegroundColor Yellow
+            
+            Set-AzSecurityPricing -Name $mdfcPricingTier.Name -Tier 'Free'
+        }
     }
 }
 

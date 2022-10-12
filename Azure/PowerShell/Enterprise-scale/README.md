@@ -11,8 +11,10 @@ With this in mind we have created a PowerShell script called [`Wipe-ESLZAzTenant
 
 - Service Principal (optional)
 - Management Groups (Only those in the hierarchy based on what you provide as an input for the parameter `intermediateRootGroupID`)
-- Move Susbcriptions, in above hierarchy, back to the Tenant Root Management Group
+- Move Subscriptions, in above hierarchy, back to the Tenant Root Management Group
 - Remove all Resources and Resource Groups from the Subscriptions in scope
+- Reset all Microsoft Defender for Cloud Pricing Tiers to Free on the Subscriptions in scope 
+  - Apart from 'CloudPosture'/'CPSM'
 - Remove all [ARM deployments history](https://docs.microsoft.com/azure/azure-resource-manager/templates/deployment-history?tabs=azure-portal) from the following scopes:
   - Tenant
   - Management Groups (Only those in the hierarchy based on what you provide as an input for the parameter `intermediateRootGroupID`)
@@ -37,14 +39,16 @@ This PowerShell script will check for each of the below before allowing it to ru
     - 'Az.Accounts' version 2.5.2 or later
     - 'Az.Resources' version 4.3.0 or later
     - 'Az.ResourceGraph' version 0.7.7 or later
+    - 'Az.Security' version 1.3.0 or later
 
 ## Input Parameters for `Wipe-ESLZAzTenant.ps1` PowerShell Script
 
-| Parameter Name | Description | Required | Example Input |
-| :------------: | :---------: | :------: | :-----------: |
-| tenantRootGroupID | This is the Azure AD Tenant ID, which is also the Name/ID for the Tenant Root Management Group (this is set by the platform when Management Groups are enabled) | Yes | "f73a2b89-6c0e-4382-899f-ea227cd6b68f" |
-| intermediateRootGroupID | This is the Name/ID of the Management Group you want to remove everything beneath, including itself. | Yes | "Contoso" |
-| eslzAADSPNName | This is the Name of the Azure AD Service Principal (SPN) that you may use for your Enterprise-scale deployment | No - Optional | "Contoso-ESLZ-SPN" |
+|     Parameter Name      |                                                                              Description                                                                               |   Required    |             Example Input              |
+| :---------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------: | :------------------------------------: |
+|    tenantRootGroupID    |    This is the Azure AD Tenant ID, which is also the Name/ID for the Tenant Root Management Group (this is set by the platform when Management Groups are enabled)     |      Yes      | "f73a2b89-6c0e-4382-899f-ea227cd6b68f" |
+| intermediateRootGroupID |                                  This is the Name/ID of the Management Group you want to remove everything beneath, including itself.                                  |      Yes      |               "Contoso"                |
+|     eslzAADSPNName      |                             This is the Name of the Azure AD Service Principal (SPN) that you may use for your Enterprise-scale deployment                             | No - Optional |           "Contoso-ESLZ-SPN"           |
+|   resetMdfcTierOnSubs   | This parameter, if set to true, will set the Microsoft Defender for Cloud (MDFC) pricing tiers for all offerings to 'Free' (apart from 'CloudPosture' - a.k.a. 'CPSM') | No - Optional |                "$true"                 |
 
 ## Example usage of `Wipe-ESLZAzTenant.ps1` PowerShell Script
 
@@ -57,6 +61,12 @@ This PowerShell script will check for each of the below before allowing it to ru
 
 ```powershell
 .\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso"
+```
+
+### Without MDFC Tiers Set To Free:
+
+```powershell
+.\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso" -resetMdfcTierOnSubs:$false
 ```
 
 ### With SPN removal:
@@ -82,8 +92,8 @@ To use this script you will need to create a new `.ps1` file locally on your mac
 ######################
 # Wipe-ESLZAzTenant #
 ######################
-# Version: 1.3
-# Last Modified: 01/10/2021
+# Version: 1.4
+# Last Modified: 12/10/2022
 # Author: Jack Tracey 
 # Contributors: Liam F. O'Neill, Paul Grimley, Jeff Mitchell
 
@@ -96,10 +106,10 @@ Fully resets an AAD tenant after deploying Enterprise Scale (Azure Landing Zone 
 
 .EXAMPLE
 # Without SPN Removal
-.\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso"
+.\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso" -resetMdfcTierOnSubs:$true
 
 # With SPN Removal
-.\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso" -eslzAADSPNName = "Contoso-ESLZ-SPN"
+.\Wipe-ESLZAzTenant.ps1 -tenantRootGroupID "f73a2b89-6c0e-4382-899f-ea227cd6b68f" -intermediateRootGroupID "Contoso" -eslzAADSPNName = "Contoso-ESLZ-SPN" -resetMdfcTierOnSubs:$true
 
 .NOTES
 Learn more about Enterprise-scale here:
@@ -126,6 +136,9 @@ https://aka.ms/es/guides
 
 # Release notes 01/10/2021 - V1.3:
 - Changed the way checks are handled for required PowerShell modules
+
+# Release notes 12/10/2022 - V1.4:
+- Added reset to MDFC tiers on each of the Subscriptions
 #>
 
 # Check for pre-reqs
@@ -133,6 +146,7 @@ https://aka.ms/es/guides
 #Requires -Modules @{ ModuleName="Az.Accounts"; ModuleVersion="2.5.2" }
 #Requires -Modules @{ ModuleName="Az.Resources"; ModuleVersion="4.3.0" }
 #Requires -Modules @{ ModuleName="Az.ResourceGraph"; ModuleVersion="0.7.7" }
+#Requires -Modules @{ ModuleName="Az.Security"; ModuleVersion="1.3.0" }
 
 
 [CmdletBinding()]
@@ -148,7 +162,11 @@ param (
 
     [Parameter(Mandatory = $false, Position = 3, HelpMessage = "(Optional) Please enter the display name of your Enterprise-scale app registration in Azure AD. If left blank, no app registration is deleted.")]
     [string]
-    $eslzAADSPNName = ""
+    $eslzAADSPNName = "",
+
+    [Parameter(Mandatory = $true, Position = 4, HelpMessage = "Do you want to reset the MDFC tiers to Free on each of the Subscriptions in scope?")]
+    [bool]
+    $resetMdfcTierOnSubs = $true
 )
 
 #Toggle to stop warnings with regards to DisplayName and DisplayId
@@ -172,7 +190,8 @@ Write-Host "The above Management Group hierarchy contains the following Subscrip
 Write-Host ""
 if ($null -ne $intermediateRootGroupChildSubscriptions) {
     $userConfirmationSubsToMove
-} else {
+}
+else {
     Write-Host "No Subscriptions found in selected/entered hierarchy"
     Write-Host ""
 }
@@ -206,7 +225,7 @@ $intermediateRootGroupChildSubscriptions | ForEach-Object -Parallel {
     if ($_.subState -ne "Disabled") {
         Write-Host "Moving Subscription: '$($_.subName)' under Tenant Root Management Group: '$($using:tenantRootGroupID)'" -ForegroundColor Cyan
         New-AzManagementGroupSubscription -GroupId $using:tenantRootGroupID -SubscriptionId $_.subID
-    }    
+    }
 }
 
 # For each Subscription in the Intermediate Root Management Group's hierarchy tree, remove all Resources, Resource Groups and Deployments
@@ -233,6 +252,20 @@ ForEach ($subscription in $intermediateRootGroupChildSubscriptions) {
     $subDeployments | ForEach-Object -Parallel {
         Write-Host "Removing $($_.DeploymentName) ..." -ForegroundColor Red
         Remove-AzSubscriptionDeployment -Id $_.Id
+    }
+
+    # Set MDFC tier to Free for each Subscription
+    if ($resetMdfcTierOnSubs) {
+        Write-Host "Resetting MDFC tier to Free for Subscription: $($subscription.subName)" -ForegroundColor Yellow
+        
+        $currentMdfcForSubUnfiltered = Get-AzSecurityPricing
+        $currentMdfcForSub = $currentMdfcForSubUnfiltered | Where-Object { $_.Name -ne "CloudPosture" }
+
+        ForEach ($mdfcPricingTier in $currentMdfcForSub) {
+            Write-Host "Resetting $($mdfcPricingTier.Name) to Free MDFC Pricing Tier for Subscription: $($subscription.subName)" -ForegroundColor Yellow
+            
+            Set-AzSecurityPricing -Name $mdfcPricingTier.Name -Tier 'Free'
+        }
     }
 }
 
