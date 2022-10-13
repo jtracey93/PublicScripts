@@ -168,8 +168,7 @@ ForEach ($subscription in $intermediateRootGroupChildSubscriptions) {
         Write-Host "Resetting MDFC tier to Free for Subscription: $($subscription.subName)" -ForegroundColor Yellow
         
         $currentMdfcForSubUnfiltered = Get-AzSecurityPricing
-        $currentMdfcForSubFilterOffering = $currentMdfcForSubUnfiltered | Where-Object { $_.Name -ne "CloudPosture" }
-        $currentMdfcForSub = $currentMdfcForSubFilterOffering | Where-Object { $_.PricingTier -ne "Free" }
+        $currentMdfcForSub = $currentMdfcForSubUnfiltered | Where-Object { $_.PricingTier -ne "Free" }
 
         ForEach ($mdfcPricingTier in $currentMdfcForSub) {
             Write-Host "Resetting $($mdfcPricingTier.Name) to Free MDFC Pricing Tier for Subscription: $($subscription.subName)" -ForegroundColor Yellow

@@ -13,8 +13,7 @@ With this in mind we have created a PowerShell script called [`Wipe-ESLZAzTenant
 - Management Groups (Only those in the hierarchy based on what you provide as an input for the parameter `intermediateRootGroupID`)
 - Move Subscriptions, in above hierarchy, back to the Tenant Root Management Group
 - Remove all Resources and Resource Groups from the Subscriptions in scope
-- Reset all Microsoft Defender for Cloud Pricing Tiers to Free on the Subscriptions in scope 
-  - Apart from 'CloudPosture'/'CPSM'
+- Reset all Microsoft Defender for Cloud Pricing Tiers to Free on the Subscriptions in scope
 - Remove all [ARM deployments history](https://docs.microsoft.com/azure/azure-resource-manager/templates/deployment-history?tabs=azure-portal) from the following scopes:
   - Tenant
   - Management Groups (Only those in the hierarchy based on what you provide as an input for the parameter `intermediateRootGroupID`)
@@ -48,7 +47,7 @@ This PowerShell script will check for each of the below before allowing it to ru
 |    tenantRootGroupID    |                   This is the Azure AD Tenant ID, which is also the Name/ID for the Tenant Root Management Group (this is set by the platform when Management Groups are enabled)                   |      Yes      | "f73a2b89-6c0e-4382-899f-ea227cd6b68f" |      N/A      |
 | intermediateRootGroupID |                                                This is the Name/ID of the Management Group you want to remove everything beneath, including itself.                                                 |      Yes      |               "Contoso"                |      N/A      |
 |     eslzAADSPNName      |                                           This is the Name of the Azure AD Service Principal (SPN) that you may use for your Enterprise-scale deployment                                            | No - Optional |           "Contoso-ESLZ-SPN"           |     `""`      |
-|   resetMdfcTierOnSubs   | This parameter, if set to true, will set the Microsoft Defender for Cloud (MDFC) pricing tiers for all offerings to 'Free' (apart from 'CloudPosture' - a.k.a. 'CPSM'). This is enabled by default. | No - Optional |                "$false"                 |    `$true`    |
+|   resetMdfcTierOnSubs   | This parameter, if set to true, will set the Microsoft Defender for Cloud (MDFC) pricing tiers for all offerings to 'Free'. This is enabled by default. | No - Optional |                "$false"                 |    `$true`    |
 
 ## Example usage of `Wipe-ESLZAzTenant.ps1` PowerShell Script
 
@@ -170,7 +169,7 @@ param (
     [string]
     $eslzAADSPNName = "",
 
-    [Parameter(Mandatory = $true, Position = 4, HelpMessage = "Do you want to reset the MDFC tiers to Free on each of the Subscriptions in scope?")]
+    [Parameter(Mandatory = $false, Position = 4, HelpMessage = "Do you want to reset the MDFC tiers to Free on each of the Subscriptions in scope?")]
     [bool]
     $resetMdfcTierOnSubs = $true
 )
@@ -265,12 +264,12 @@ ForEach ($subscription in $intermediateRootGroupChildSubscriptions) {
         Write-Host "Resetting MDFC tier to Free for Subscription: $($subscription.subName)" -ForegroundColor Yellow
         
         $currentMdfcForSubUnfiltered = Get-AzSecurityPricing
-        $currentMdfcForSub = $currentMdfcForSubUnfiltered | Where-Object { $_.Name -ne "CloudPosture" }
+        $currentMdfcForSub = $currentMdfcForSubUnfiltered | Where-Object { $_.PricingTier -ne "Free" }
 
         ForEach ($mdfcPricingTier in $currentMdfcForSub) {
             Write-Host "Resetting $($mdfcPricingTier.Name) to Free MDFC Pricing Tier for Subscription: $($subscription.subName)" -ForegroundColor Yellow
             
-            Set-AzSecurityPricing -Name $mdfcPricingTier.Name -Tier 'Free'
+            Set-AzSecurityPricing -Name $mdfcPricingTier.Name -PricingTier 'Free'
         }
     }
 }
