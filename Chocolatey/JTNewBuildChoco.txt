@@ -43,7 +43,7 @@ choco install keepass -y
 
 # Optional
 choco install camtasia -y
-choco install snagit -y
+choco install snagit --version=2021.4.5 -y
 
 # Git Config Setup
 git config --global user.name "Jack Tracey"
