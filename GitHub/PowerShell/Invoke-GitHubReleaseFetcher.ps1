@@ -122,11 +122,10 @@ if ($syncAllReleases -eq $true) {
                     Move-Item -Path "$($extractedSubFolder.FullName)/$($path)" -Destination "$releaseDirectory" -ErrorAction SilentlyContinue
                 }
             }
-            else {
-                Write-Host ""
-                Write-Host "===> Moving all extracted contents into $releaseDirectory." -ForegroundColor Cyan
-                Move-Item -Path "$($extractedSubFolder.FullName)" -Destination "$releaseDirectory" -ErrorAction SilentlyContinue
-            }
+
+            Write-Host ""
+            Write-Host "===> Moving all extracted contents into $releaseDirectory." -ForegroundColor Cyan
+            Move-Item -Path "$($extractedSubFolder.FullName)/*" -Destination "$releaseDirectory" -ErrorAction SilentlyContinue
 
             Remove-Item -Path "$releaseDirectory/tmp" -Force -Recurse
 
@@ -173,11 +172,10 @@ if ($syncAllReleases -eq $false) {
                 Move-Item -Path "$($extractedSubFolder.FullName)/$($path)" -Destination "$releaseDirectory" -ErrorAction SilentlyContinue
             }
         }
-        else {
-            Write-Host ""
-            Write-Host "===> Moving all extracted contents into $releaseDirectory." -ForegroundColor Cyan
-            Move-Item -Path "$($extractedSubFolder.FullName)" -Destination "$releaseDirectory" -ErrorAction SilentlyContinue
-        }
+
+        Write-Host ""
+        Write-Host "===> Moving all extracted contents into $releaseDirectory." -ForegroundColor Cyan
+        Move-Item -Path "$($extractedSubFolder.FullName)/*" -Destination "$releaseDirectory" -ErrorAction SilentlyContinue
 
         Remove-Item -Path "$releaseDirectory/tmp" -Force -Recurse
 
