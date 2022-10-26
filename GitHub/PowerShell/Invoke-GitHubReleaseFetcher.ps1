@@ -1,9 +1,9 @@
 ####################################
 # Invoke-GitHubReleaseFetcher.ps1 #
 ####################################
-# Version: 1.0.0
-# Last Modified: 25/10/2022
-# Author: Jack Tracey 
+# Version: 1.1.0
+# Last Modified: 26/10/2022
+# Author: Jack Tracey
 
 <#
 .SYNOPSIS
@@ -21,8 +21,11 @@ $keepThese = @("version.json", "infra-as-code")
 ./Invoke-GitHubReleaseFetcher.ps1 -githubRepoUrl "https://github.com/Azure/ALZ-Bicep" -syncAllReleases:$true -directoryAndFilesToKeep $keepThese
 
 .NOTES
-# Release notes 25/10/2021 - V1.0: 
+# Release notes 25/10/2021 - V1.0.0: 
 - Initial release.
+
+# Release notes 26/10/2021 - V1.1.0: 
+- Add support to move all extracted contents to release directories if $directoryAndFilesToKeep is not specified or is a empty array (which is the default).
 #>
 
 # Check for pre-reqs
@@ -119,6 +122,11 @@ if ($syncAllReleases -eq $true) {
                     Move-Item -Path "$($extractedSubFolder.FullName)/$($path)" -Destination "$releaseDirectory" -ErrorAction SilentlyContinue
                 }
             }
+            else {
+                Write-Host ""
+                Write-Host "===> Moving all extracted contents into $releaseDirectory." -ForegroundColor Cyan
+                Move-Item -Path "$($extractedSubFolder.FullName)" -Destination "$releaseDirectory" -ErrorAction SilentlyContinue
+            }
 
             Remove-Item -Path "$releaseDirectory/tmp" -Force -Recurse
 
@@ -164,6 +172,11 @@ if ($syncAllReleases -eq $false) {
                 Write-Host "===> Moving $path into $releaseDirectory." -ForegroundColor Cyan
                 Move-Item -Path "$($extractedSubFolder.FullName)/$($path)" -Destination "$releaseDirectory" -ErrorAction SilentlyContinue
             }
+        }
+        else {
+            Write-Host ""
+            Write-Host "===> Moving all extracted contents into $releaseDirectory." -ForegroundColor Cyan
+            Move-Item -Path "$($extractedSubFolder.FullName)" -Destination "$releaseDirectory" -ErrorAction SilentlyContinue
         }
 
         Remove-Item -Path "$releaseDirectory/tmp" -Force -Recurse
