@@ -15,13 +15,13 @@ Creates a new SPN, or uses an existing SPN/MI, and assigns it the 'SubscriptionC
 
 .EXAMPLE
 # Create a new SPN and grant it the 'SubscriptionCreator' role on the specified EA billing account
-./Invoke-BillingSPNPermissionsSetup.ps1 -eaBillingAccountId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654'
+./Invoke-EABillingSPNPermissionsSetup.ps1 -eaBillingAccountId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654'
 
 # Create a new SPN, with a custom name, and grant it the 'SubscriptionCreator' role on the specified EA billing account
-./Invoke-BillingSPNPermissionsSetup.ps1 -eaBillingAccountId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654' -newSpnDisplayName 'spn-lz-sub-vending-custom-name'
+./Invoke-EABillingSPNPermissionsSetup.ps1 -eaBillingAccountId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654' -newSpnDisplayName 'spn-lz-sub-vending-custom-name'
 
 # Use an existing SPN/MI and grant it the 'SubscriptionCreator' role on the specified EA billing account
-./Invoke-BillingSPNPermissionsSetup.ps1 -eaBillingAccountId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654' -existingSpnMiObjectId 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+./Invoke-EABillingSPNPermissionsSetup.ps1 -eaBillingAccountId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654' -existingSpnMiObjectId 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
 
 .NOTES
 # Release notes 22/12/2022 - V1.0.0:
