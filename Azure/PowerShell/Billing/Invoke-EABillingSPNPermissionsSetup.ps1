@@ -1,8 +1,8 @@
 ###########################################
 # Invoke-EABillingSPNPermissionsSetup.ps1 #
 ###########################################
-# Version: 1.0.0
-# Last Modified: 22/12/2022
+# Version: 1.1.0
+# Last Modified: 23/12/2022
 # Author: Jack Tracey (jtracey93)
 # Source: https://github.com/jtracey93/PublicScripts/blob/master/Azure/PowerShell/Billing/Invoke-EABillingSPNPermissionsSetup.ps1
 
@@ -14,18 +14,29 @@ Creates a new SPN, or uses an existing SPN/MI, and assigns it the 'SubscriptionC
 Creates a new SPN, or uses an existing SPN/MI, and assigns it the 'SubscriptionCreator' role to it to allow it to create subscriptions in the specified EA billing enrollment account.
 
 .EXAMPLE
-# Create a new SPN and grant it the 'SubscriptionCreator' role on the specified EA billing account
-./Invoke-EABillingSPNPermissionsSetup.ps1 -eaBillingAccountId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654'
+# Create a new SPN and grant it the 'SubscriptionCreator' role on the specified EA billing account - using the 'eaEnrollmentNumber' and 'eaEnrollmentAccountNumber' parameters
+/Invoke-EABillingSPNPermissionsSetup.ps1 -eaEnrollmentNumber "123456" -eaEnrollmentAccountNumber "987654"
 
-# Create a new SPN, with a custom name, and grant it the 'SubscriptionCreator' role on the specified EA billing account
-./Invoke-EABillingSPNPermissionsSetup.ps1 -eaBillingAccountId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654' -newSpnDisplayName 'spn-lz-sub-vending-custom-name'
+# Create a new SPN and grant it the 'SubscriptionCreator' role on the specified EA billing account - using the 'eaBillingAccountResourceId' parameter
+./Invoke-EABillingSPNPermissionsSetup.ps1 -eaBillingAccountResourceId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654'
 
-# Use an existing SPN/MI and grant it the 'SubscriptionCreator' role on the specified EA billing account
-./Invoke-EABillingSPNPermissionsSetup.ps1 -eaBillingAccountId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654' -existingSpnMiObjectId 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+# Create a new SPN, with a custom name, and grant it the 'SubscriptionCreator' role on the specified EA billing account - using the 'eaEnrollmentNumber' and 'eaEnrollmentAccountNumber' parameters
+./Invoke-EABillingSPNPermissionsSetup.ps1 -eaEnrollmentNumber "123456" -eaEnrollmentAccountNumber "987654" -newSpnDisplayName 'spn-lz-sub-vending-custom-name'
 
+# Create a new SPN, with a custom name, and grant it the 'SubscriptionCreator' role on the specified EA billing account - using the 'eaBillingAccountResourceId' parameter
+./Invoke-EABillingSPNPermissionsSetup.ps1 -eaBillingAccountResourceId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654' -newSpnDisplayName 'spn-lz-sub-vending-custom-name'
+
+# Use an existing SPN/MI and grant it the 'SubscriptionCreator' role on the specified EA billing account - using the 'eaEnrollmentNumber' and 'eaEnrollmentAccountNumber' parameters
+./Invoke-EABillingSPNPermissionsSetup.ps1 -eaEnrollmentNumber "123456" -eaEnrollmentAccountNumber "987654" -existingSpnMiObjectId 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+
+# Use an existing SPN/MI and grant it the 'SubscriptionCreator' role on the specified EA billing account - using the 'eaBillingAccountResourceId' parameter
+./Invoke-EABillingSPNPermissionsSetup.ps1 -eaBillingAccountResourceId '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654' -existingSpnMiObjectId 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
 .NOTES
 # Release notes 22/12/2022 - V1.0.0:
 - Initial release.
+
+# Release notes 23/12/2022 - V1.1.0:
+- Added simplified inputs for the 'eaEnrollmentNumber' and 'eaEnrollmentAccountNumber' parameters to form the 'eaBillingAccountResourceId' parameter value, instead of having to provide the full resource ID in the 'eaBillingAccountResourceId' parameter.
 #>
 
 # Check for pre-reqs
@@ -33,17 +44,25 @@ Creates a new SPN, or uses an existing SPN/MI, and assigns it the 'SubscriptionC
 #Requires -Modules @{ ModuleName="Az.Accounts"; ModuleVersion="2.10.4" }
 #Requires -Modules @{ ModuleName="Az.Resources"; ModuleVersion="6.5.0" }
 
-[CmdletBinding()]
+[CmdletBinding(DefaultParameterSetName = "Default")]
 param (
-  [Parameter(Mandatory = $true, Position = 1, HelpMessage = "Provide the EA enrollment/billing account ID that the SPN will be granted the 'SubscriptionCreator' role upon. Example: '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/123456'")]
+  [Parameter(ParameterSetName = "Default", Mandatory = $false, Position = 1, HelpMessage = "Provide the EA enrollment number that the SPN will be granted the 'SubscriptionCreator' role upon. Example: '1234567'. This parameter is only used if the 'eaBillingAccountResourceId' parameter is not provided. It's value is used to create the 'eaBillingAccountResourceId' parameter value, that looks like this: '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654' (this parameter value is the middle numerical value).")]
   [string]
-  $eaBillingAccountId,
+  $eaEnrollmentNumber,
 
-  [Parameter(Mandatory = $false, Position = 2, HelpMessage = "(Optional) Provide an existing Service Principal Name (SPN) (aka Enterprise Application) 'Object ID' to grant the 'SubscriptionCreator' role to on the specified billing account instead of creating a new one. If left blank a new SPN will be created.")]
+  [Parameter(ParameterSetName = "Default", Mandatory = $false, Position = 2, HelpMessage = "Provide the EA enrollment Account Number/ID that the SPN will be granted the 'SubscriptionCreator' role upon. Example: '987654'. This parameter is only used if the 'eaBillingAccountResourceId' parameter is not provided. It's value is used to create the 'eaBillingAccountResourceId' parameter value, that looks like this: '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/987654' (this parameter value is the middle numerical value).")]
+  [string]
+  $eaEnrollmentAccountNumber,
+
+  [Parameter(ParameterSetName = "Advanced", Mandatory = $false, Position = 4, HelpMessage = "Provide the EA enrollment/billing account ID that the SPN will be granted the 'SubscriptionCreator' role upon. Example: '/providers/Microsoft.Billing/billingAccounts/1234567/enrollmentAccounts/123456'")]
+  [string]
+  $eaBillingAccountResourceId,
+
+  [Parameter(ParameterSetName = "Default", Mandatory = $false, Position = 3, HelpMessage = "(Optional) Provide an existing Service Principal Name (SPN) (aka Enterprise Application) 'Object ID' to grant the 'SubscriptionCreator' role to on the specified billing account instead of creating a new one. If left blank a new SPN will be created.")]
   [string]
   $existingSpnMiObjectId = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
 
-  [Parameter(Mandatory = $false, Position = 3, HelpMessage = "(Optional) Provide a Display Name for the new Service Principal (SPN) (aka Enterprise Application) to be created. If left blank the default value of 'spn-lz-sub-vending' will be used.")]
+  [Parameter(ParameterSetName = "Advanced", Mandatory = $false, Position = 5, HelpMessage = "(Optional) Provide a Display Name for the new Service Principal (SPN) (aka Enterprise Application) to be created. If left blank the default value of 'spn-lz-sub-vending' will be used.")]
   [string]
   $newSpnDisplayName = "spn-lz-sub-vending"
 )
@@ -52,20 +71,31 @@ param (
 Write-Host "Checking inputs..." -ForegroundColor Cyan
 Write-Host ""
 
-# Check $eabillingaccountid is valid and exists
-Write-Host "EA billing account ID provided..." -ForegroundColor Cyan
-Write-Host "Checking the specified EA billing account ID '$($eaBillingAccountId)' exists..." -ForegroundColor Yellow
+# Check $eaBillingAccountResourceId is valid and populate from $eaEnrollmentNumber and $eaEnrollmentAccountNumber if not provided
+if ($eaBillingAccountResourceId -eq $null -or $eaBillingAccountResourceId -eq "") {
+  Write-Host "eaBillingAccountResourceId paramter value not set, forming parameter value from eaEnrollmentNumber and eaEnrollmentAccountNumber parameters..." -ForegroundColor Magenta
+  if ($eaEnrollmentNumber -eq $null -or $eaEnrollmentAccountNumber -eq $null -or $eaEnrollmentNumber -eq '' -or $eaEnrollmentAccountNumber -eq '') {
+    throw "No values provdided for the 'eaEnrollmentNumber' and 'eaEnrollmentAccountNumber' parameters. These parameters are required if the 'eaBillingAccountResourceId' parameter is not provided. Please provide values for these parameters and try again."
+  }
+  $eaBillingAccountResourceId = "/providers/Microsoft.Billing/billingAccounts/$eaEnrollmentNumber/enrollmentAccounts/$eaEnrollmentAccountNumber"
+  Write-Host "eaBillingAccountResourceId parameter value set to '$($eaBillingAccountResourceId)'" -ForegroundColor Green
+  Write-Host ""
+}
 
-if ($null -ne $eaBillingAccountId) {
-  $getEaBillingAccountId = Invoke-AzRestMethod -Method GET -Path "$($eaBillingAccountId)?api-version=2019-10-01-preview" -ErrorAction SilentlyContinue
+# Check $eaBillingAccountResourceId is valid and exists
+Write-Host "EA billing account parameters provided..." -ForegroundColor Cyan
+Write-Host "Checking the specified EA billing account ID '$($eaBillingAccountResourceId)' exists..." -ForegroundColor Yellow
 
-  if ($getEaBillingAccountId.StatusCode -ne 200) {
-    Write-Error "HTTP Status Code: $($getEaBillingAccountId.StatusCode)"
-    Write-Error "HTTP Repsone Content: $($getEaBillingAccountId.Content)"
-    throw "The specified EA billing account ID '$($eaBillingAccountId)' does not exist. Please check the value and try again. Also ensure you are logged in as the EA Account Owner for the specified EA billing account."
+if ($null -ne $eaBillingAccountResourceId -and $eaBillingAccountResourceId -ne "") {
+  $geteaBillingAccountResourceId = Invoke-AzRestMethod -Method GET -Path "$($eaBillingAccountResourceId)?api-version=2019-10-01-preview" -ErrorAction SilentlyContinue
+
+  if ($geteaBillingAccountResourceId.StatusCode -ne 200) {
+    Write-Error "HTTP Status Code: $($geteaBillingAccountResourceId.StatusCode)"
+    Write-Error "HTTP Repsone Content: $($geteaBillingAccountResourceId.Content)"
+    throw "The specified EA billing account ID '$($eaBillingAccountResourceId)' does not exist. Please check the value and try again. Also ensure you are logged in as the EA Account Owner for the specified EA billing account."
   }
   else {
-    Write-Host "The specified EA billing account ID '$($eaBillingAccountId)' exists. Continuing..." -ForegroundColor Green
+    Write-Host "The specified EA billing account ID '$($eaBillingAccountResourceId)' exists. Continuing..." -ForegroundColor Green
     Write-Host ""
   }
 }
@@ -106,7 +136,7 @@ else {
 
 # Grant SPN/MI access to the specified EA billing account
 Write-Host "Pre-reqs passed and complete..." -ForegroundColor Cyan
-Write-Host "Granting the 'SubscriptionCreator' role (ID: 'a0bcee42-bf30-4d1b-926a-48d21664ef71') on the EA Billing Account ID of: '$($eaBillingAccountId)' to the AAD Object ID of: '$($finalSpnMiObjectId)' which has the Display Name of: '$($finalSpnMiDisplayName)'..." -ForegroundColor Yellow
+Write-Host "Granting the 'SubscriptionCreator' role (ID: 'a0bcee42-bf30-4d1b-926a-48d21664ef71') on the EA Billing Account ID of: '$($eaBillingAccountResourceId)' to the AAD Object ID of: '$($finalSpnMiObjectId)' which has the Display Name of: '$($finalSpnMiDisplayName)'..." -ForegroundColor Yellow
 
 # Get the current AAD Tenant ID
 $currentTenant = Get-AzTenant -ErrorAction Stop
@@ -117,13 +147,13 @@ $roleAssignmentName = New-Guid
 $roleAssignmentHashTable = [ordered]@{
   "properties" = @{
     "principalId"       = "$finalSpnMiObjectId"
-    "roleDefinitionId"  = "$eaBillingAccountId/billingRoleDefinitions/a0bcee42-bf30-4d1b-926a-48d21664ef71"
+    "roleDefinitionId"  = "$eaBillingAccountResourceId/billingRoleDefinitions/a0bcee42-bf30-4d1b-926a-48d21664ef71"
     "principalTenantId" = "$($currentTenant.TenantId)"
   }
 }
 $roleAssignmentPayloadJson = $roleAssignmentHashTable | ConvertTo-Json -Depth 100
 
-$grantRbac = Invoke-AzRestMethod -Method PUT -Path "$($eaBillingAccountId)/billingRoleAssignments/$($roleAssignmentName)?api-version=2019-10-01-preview" -Payload $roleAssignmentPayloadJson -ErrorAction SilentlyContinue
+$grantRbac = Invoke-AzRestMethod -Method PUT -Path "$($eaBillingAccountResourceId)/billingRoleAssignments/$($roleAssignmentName)?api-version=2019-10-01-preview" -Payload $roleAssignmentPayloadJson -ErrorAction SilentlyContinue
 
 # Create variables for retry loop
 $retryCount = 0
@@ -138,7 +168,7 @@ if ($grantRbac.StatusCode -eq 400 -and $grantRbac.Content.Contains("are not vali
     Start-Sleep -Seconds $retryDelay
     $retryCount++
 
-    $grantRbac = Invoke-AzRestMethod -Method PUT -Path "$($eaBillingAccountId)/billingRoleAssignments/$($roleAssignmentName)?api-version=2019-10-01-preview" -Payload $roleAssignmentPayloadJson -ErrorAction SilentlyContinue
+    $grantRbac = Invoke-AzRestMethod -Method PUT -Path "$($eaBillingAccountResourceId)/billingRoleAssignments/$($roleAssignmentName)?api-version=2019-10-01-preview" -Payload $roleAssignmentPayloadJson -ErrorAction SilentlyContinue
 
     if ($grantRbac.StatusCode -eq 200) {
       break
