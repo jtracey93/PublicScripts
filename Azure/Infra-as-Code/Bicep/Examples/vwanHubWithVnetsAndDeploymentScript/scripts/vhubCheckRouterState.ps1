@@ -7,7 +7,7 @@ param (
   $apiVersion = "2022-01-01"
 )
 
-$vHubRouterExistenceCheck = Invoke-AzRestMethod -Method GET -Path "$($vHubResourceId)?api-version=$($apiVersion)"
+$vHubRouterExistenceCheck = Invoke-AzRestMethod -Method GET -Path "$($vHubResourceId)?api-version=$($apiVersion)" -ErrorAction SilentlyContinue
 
 if ($vHubRouterExistenceCheck.StatusCode -ne "200") {
   $DeploymentScriptOutputs["vHubRouterState"] = "Not Found"
