@@ -1,14 +1,14 @@
 @description('The Resource ID of the Azure Resource you wish to check a properties state of.')
 param parAzResourceId string
 
-@description('The API Version of the Azure Resource you wish to use to check a properties state. Defaults to `2022-05-01`.')
-param parAzResourceApiVersion string = '2022-05-01'
+@description('The API Version of the Azure Resource you wish to use to check a properties state.')
+param parAzResourceApiVersion string
 
-@description('The property of the resource that you wish to check. This is a property inside the `properties` bag of the resource that is captured from a GET call to the Resource ID. Defaults to `provisioningState`.')
-param parAzResourcePropertyToCheck string = 'provisioningState'
+@description('The property of the resource that you wish to check. This is a property inside the `properties` bag of the resource that is captured from a GET call to the Resource ID.')
+param parAzResourcePropertyToCheck string
 
-@description('The value of the property of the resource that you wish to check. Defaults to `Provisioned`')
-param parAzResourceDesiredState string = 'Provisioned'
+@description('The value of the property of the resource that you wish to check.')
+param parAzResourceDesiredState string
 
 @description('How long in seconds the deployment script should wait between check/polling requestes to check the property, and its state, if not in its desired state. Defaults to `30`')
 param parWaitInSecondsBetweenIterations int = 30

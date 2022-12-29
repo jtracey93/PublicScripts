@@ -3,9 +3,6 @@ targetScope = 'resourceGroup'
 @description('Azure region to deploy to')
 param region string = 'uksouth'
 
-@description('Azure region naming prefix')
-param regionNamePrefix string = 'uks'
-
 @description('Tags to apply to applicable resoruces')
 param defaultTags object = {
   'IaC-Source': 'jtracey93/PublicScripts'
@@ -24,7 +21,6 @@ param vnets array = [
         }
       }
     ]
-    deployBastion: 'yes'
   }
   {
     name: 'vnet-uks-2'
@@ -43,16 +39,13 @@ param vnets array = [
         }
       }
     ]
-    deployBastion: 'no'
   }
   {
     name: 'vnet-uks-3'
     cidr: '10.3.0.0/16'
     subnets: []
-    deployBastion: 'no'
   }
 ]
-
 
 resource resVNETs 'Microsoft.Network/virtualNetworks@2021-02-01' = [for vnet in vnets: {
   name: vnet.name

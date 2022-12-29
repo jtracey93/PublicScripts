@@ -1,18 +1,75 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "region": {
-      "value": "uksouth"
-    },
-    "regionNamePrefix": {
-      "value": "uks"
-    },
-    "deployVPNGateway": {
-      "value": false
-    },
-    "vwanHubCIDR": {
-      "value": "10.0.0.0/23"
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "region": {
+            "value": "uksouth"
+        },
+        "regionNamePrefix": {
+            "value": "uks"
+        },
+        "defaultTags": {
+            "value": {
+              "IaC-Source": "jtracey93/PublicScripts",
+              "DemoOf": "Deployment Scripts Property Checker With VWAN, VWAN Hub & 3 Spokes"
+            }
+        },
+        "vwanHubCIDR": {
+            "value": "10.0.0.0/23"
+        },
+        "vnets": {
+            "value": [
+              {
+                "name": "vnet-uks-1",
+                "cidr": "10.1.0.0/16",
+                "subnets": [
+                  {
+                    "name": "AzureBastionSubnet",
+                    "properties": {
+                      "addressPrefix": "10.1.0.0/24"
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "vnet-uks-2",
+                "cidr": "10.2.0.0/16",
+                "subnets": [
+                  {
+                    "name": "subnet-1",
+                    "properties": {
+                      "addressPrefix": "10.2.0.0/24"
+                    }
+                  },
+                  {
+                    "name": "subnet-2",
+                    "properties": {
+                      "addressPrefix": "10.2.1.0/24"
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "vnet-uks-3",
+                "cidr": "10.3.0.0/16",
+                "subnets": []
+              }
+            ]
+        },
+        "parAzResourceApiVersion": {
+            "value": "2022-01-01"
+        },
+        "parAzResourcePropertyToCheck": {
+            "value": "routingState"
+        },
+        "parAzResourceDesiredState": {
+            "value": "Provisioned"
+        },
+        "parWaitInSecondsBetweenIterations": {
+            "value": 10
+        },
+        "parMaxIterations": {
+            "value": 100
+        }
     }
-  }
 }
