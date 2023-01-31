@@ -62,7 +62,7 @@ param (
   [string]
   $existingSpnMiObjectId = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
 
-  [Parameter(ParameterSetName = "Advanced", Mandatory = $false, Position = 5, HelpMessage = "(Optional) Provide a Display Name for the new Service Principal (SPN) (aka Enterprise Application) to be created. If left blank the default value of 'spn-lz-sub-vending' will be used.")]
+  [Parameter(ParameterSetName = "Default", Mandatory = $false, Position = 5, HelpMessage = "(Optional) Provide a Display Name for the new Service Principal (SPN) (aka Enterprise Application) to be created. If left blank the default value of 'spn-lz-sub-vending' will be used.")]
   [string]
   $newSpnDisplayName = "spn-lz-sub-vending"
 )
