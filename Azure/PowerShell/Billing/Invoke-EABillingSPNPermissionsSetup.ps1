@@ -113,6 +113,7 @@ if ($existingSpnMiObjectId -ne $null -and $existingSpnMiObjectId -ne "xxxxxxxx-x
     Write-Host "The specified SPN/MI 'Object ID' '$($existingSpnMiObjectId)' exists with a Display Name of: '$($getexistingSpnMiObjectId.DisplayName)' with a Type of: '$($getexistingSpnMiObjectId.ServicePrincipalType)'. Continuing..." -ForegroundColor Green
     Write-Host ""
     $finalSpnMiObjectId = $getexistingSpnMiObjectId.Id
+    $finalSpnMiAppId = $getexistingSpnMiObjectId.AppId
     $finalSpnMiDisplayName = $getexistingSpnMiObjectId.DisplayName
     $finalSpnMiType = $getexistingSpnMiObjectId.ServicePrincipalType
   }
@@ -129,6 +130,7 @@ else {
   $finalSpnMiObjectId = $newSpn.Id
   $finalSpnMiDisplayName = $newSpn.DisplayName
   $finalSpnMiType = $newSpn.ServicePrincipalType
+  $finalSpnMiAppId = $newSpn.AppId
 }
 
 ## convert this to a retry loop
@@ -184,6 +186,7 @@ else {
   Write-Host "The 'SubscriptionCreator' role has been granted to the SPN/MI." -ForegroundColor Green
   Write-Host ""
   Write-Host "The SPN/MI 'Object ID' is: '$($finalSpnMiObjectId)'" -ForegroundColor Green
+  Write-Host "The SPN/MI 'App ID' is: '$($finalSpnMiAppId)'" -ForegroundColor Green
   Write-Host "The SPN/MI 'Display Name' is: '$($finalSpnMiDisplayName)'" -ForegroundColor Green
   Write-Host "The SPN/MI 'Type' is: '$($finalSpnMiType)'" -ForegroundColor Green
 }
