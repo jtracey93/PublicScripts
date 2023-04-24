@@ -253,10 +253,6 @@ ForEach ($subscription in $intermediateRootGroupChildSubscriptions) {
     }
 }
 
-# Remove orphaned/identity not found RBAC role assignments from each subscription
-Write-Host "Removing Oprhaned/Identity Not Found Role Assignments for all subscriptions: $($intermediateRootGroupChildSubscriptions.subID)" -ForegroundColor Yellow
-Invoke-RemoveOrphanedRoleAssignment -SubscriptionId $intermediateRootGroupChildSubscriptions.subID
-
 # Get all AAD Tenant level deployments
 $tenantDeployments = Get-AzTenantDeployment
 
@@ -303,6 +299,10 @@ function Remove-Recursively($name) {
 
 # Remove all the Management Groups in Intermediate Root Management Group's hierarchy tree, including itself
 Remove-Recursively($intermediateRootGroupID)
+
+# Remove orphaned/identity not found RBAC role assignments from each subscription
+Write-Host "Removing Oprhaned/Identity Not Found Role Assignments for all subscriptions: $($intermediateRootGroupChildSubscriptions.subID)" -ForegroundColor Yellow
+Invoke-RemoveOrphanedRoleAssignment -SubscriptionId $intermediateRootGroupChildSubscriptions.subID
 
 # Stop timer
 $StopWatch.Stop()
