@@ -5,6 +5,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 # Install Apps & Fonts
 choco install microsoft-edge-insider-dev -y
 choco install vscode -y
+choco install vscode-insiders -y
 choco install pwsh -y
 choco install git -y
 choco install notepadplusplus -y
