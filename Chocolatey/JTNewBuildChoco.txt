@@ -64,6 +64,7 @@ Install-Module oh-my-posh -Scope CurrentUser
 Install-Module -Name PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
 Install-Module -Name Terminal-Icons -Repository PSGallery
 Install-Module -Name PSReadLine -AllowPrerelease -Force
+Install-Module -Name Microsoft.PowerShell.ConsoleGuiTools 
 
 # Terminal Config
 code $PROFILE
