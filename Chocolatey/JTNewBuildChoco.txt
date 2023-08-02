@@ -42,6 +42,7 @@ choco install cascadia-code-nerd-font -y
 choco install gnupg -y
 choco install keepass -y
 choco install streamdeck -y
+choco install azd -y
 
 # Optional
 choco install camtasia -y
