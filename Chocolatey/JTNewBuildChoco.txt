@@ -43,6 +43,7 @@ choco install gnupg -y
 choco install keepass -y
 choco install streamdeck -y
 choco install azd -y
+choco install advanced-ip-scanner -y
 
 # Optional
 choco install camtasia -y
