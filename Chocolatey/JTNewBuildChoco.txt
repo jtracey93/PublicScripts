@@ -3,10 +3,10 @@
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 # Install Apps & Fonts
-choco install microsoft-edge-insider-dev -y
-choco install vscode -y
-choco install vscode-insiders -y
 choco install pwsh -y
+choco install microsoft-edge-insider-dev -y
+#choco install vscode -y
+choco install vscode-insiders -y
 choco install git -y
 choco install notepadplusplus -y
 choco install adobereader -y
@@ -44,6 +44,14 @@ choco install keepass -y
 choco install streamdeck -y
 choco install azd -y
 choco install advanced-ip-scanner -y
+choco install pandoc -y
+choco install pester -y
+choco install go -y
+choco install miktex -y
+choco install firefox -y
+choco install act-cli -y
+choco install docker -y
+choco install oh-my-posh -y
 
 # Optional
 choco install camtasia -y
