@@ -50,12 +50,12 @@ choco install go -y
 choco install miktex -y
 choco install firefox -y
 choco install act-cli -y
-choco install docker -y
+choco install docker-desktop -y
 choco install oh-my-posh -y
 
 # Optional
-choco install camtasia -y
-choco install snagit --version=2021.4.5 -y
+#choco install camtasia -y
+#choco install snagit --version=2021.4.5 -y
 
 # Git Config Setup
 git config --global user.name "Jack Tracey"
@@ -63,9 +63,12 @@ git config --global user.email "jack@jacktracey.co.uk"
 git config --global core.editor "code --wait"
 
 ## Setup GPG for Git
+choco install gpg4win -y
 
 # WSL 
 wsl --install
+wsl --set-default-version 2
+
 
 # Install PowerShell Modules
 Install-Module Az
