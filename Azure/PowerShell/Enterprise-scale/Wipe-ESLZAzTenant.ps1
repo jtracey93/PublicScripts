@@ -51,6 +51,9 @@ https://aka.ms/es/guides
 
 # Release notes 06/04/2023 - V1.5:
 - Added deleting orphaned role assignments from subscriptions in scope of the Intermediate Root Management Group specified.
+
+# Release notes 11/08/2025 - V1.5:
+- Added logic for MDFC Discovery Tier only having Standard tier
 #>
 
 # Check for pre-reqs
