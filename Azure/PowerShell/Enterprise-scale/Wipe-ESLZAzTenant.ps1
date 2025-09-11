@@ -245,10 +245,16 @@ ForEach ($subscription in $intermediateRootGroupChildSubscriptions) {
         $currentMdfcForSubUnfiltered = Get-AzSecurityPricing
         $currentMdfcForSub = $currentMdfcForSubUnfiltered | Where-Object { $_.PricingTier -ne "Free" }
 
-        ForEach ($mdfcPricingTier in $currentMdfcForSub) {
-            Write-Host "Resetting $($mdfcPricingTier.Name) to Free MDFC Pricing Tier for Subscription: $($subscription.subName)" -ForegroundColor Yellow
-            
-            Set-AzSecurityPricing -Name $mdfcPricingTier.Name -PricingTier 'Free'
+       ForEach ($mdfcPricingTier in $currentMdfcForSub) {
+            if ("Discovery" -eq $mdfcPricingTier.Name) {
+                Write-Output "Resetting $($mdfcPricingTier.Name) to Standard MDFC Pricing Tier, as only tier available, for Subscription: $($subscription.name)"
+
+                Set-AzSecurityPricing -Name $mdfcPricingTier.Name -PricingTier 'Standard' | Out-Null
+            } else {
+                Write-Output "Resetting $($mdfcPricingTier.Name) to Free MDFC Pricing Tier for Subscription: $($subscription.name)"
+
+                Set-AzSecurityPricing -Name $mdfcPricingTier.Name -PricingTier 'Free' | Out-Null
+            }
         }
     }
 }
