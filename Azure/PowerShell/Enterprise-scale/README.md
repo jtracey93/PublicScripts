@@ -1,6 +1,9 @@
 
 # Cleaning up an Enterprise-scale deployment
 
+> [!TIP]
+> This script has been integrated into the [Azure landing zone (ALZ) PowerShell module `ALZ`](https://www.powershellgallery.com/packages/ALZ/) and will now be evolved and expanded upon there. Please use this going forward! For information on installing and using see the [docs](https://azure.github.io/Azure-Landing-Zones/accelerator/faq/cleanup/) or the various [examples in the script itself](https://github.com/Azure/ALZ-PowerShell-Module/blob/main/src/ALZ/Public/Remove-PlatformLandingZone.ps1#L109-L181)
+
 > :warning: :no_entry: :warning: **This script will completely remove a Management Group and everything within its hierarchy**
 >  
 > **USE WITH EXTREME CAUTION AND ONLY IF YOU FULLY UNDERSTAND THE OUTCOME OF RUNNING THIS SCRIPT FROM THE BELOW DOCUMENTATION**
