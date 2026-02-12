@@ -52,6 +52,8 @@ choco install firefox -y
 choco install act-cli -y
 choco install docker-desktop -y
 choco install oh-my-posh -y
+choco install lazygit -y
+winget install GitHub.Copilot.Prerelease
 
 # Optional
 #choco install camtasia -y
